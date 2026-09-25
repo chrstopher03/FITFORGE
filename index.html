@@ -236,6 +236,161 @@ button{font-family:inherit}
 }
 @media(min-width:801px){.main{overflow-x:hidden}}
 
+
+/* =========================================================
+   FITFORGE — MOBILE UI V2
+   Prioridad: telefono 320–480px, sin desbordes y aspecto de app
+   ========================================================= */
+@media (max-width:800px){
+  html{width:100%;overflow-x:hidden}
+  body{width:100%;min-width:0;margin:0;overflow-x:hidden;background:#f6f6f4}
+  .app{width:100%;min-width:0;overflow-x:hidden}
+  .desktop-nav{display:none!important}
+  .main{box-sizing:border-box;width:100%!important;max-width:100%!important;margin:0!important;padding:14px 12px calc(94px + env(safe-area-inset-bottom))!important;overflow:visible!important}
+  .view{width:100%!important;max-width:100%!important;overflow:visible!important}
+  .view.active{display:block;width:100%}
+  .topbar{width:100%;margin:0 0 16px;min-height:48px;gap:8px}
+  .greeting{flex:1 1 auto;min-width:0;overflow:hidden}
+  .greeting small{font-size:10px}
+  .greeting h1{font-size:21px!important;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top-actions{flex:0 0 auto;gap:7px}
+  .top-actions .icon-btn{width:40px;height:40px;border-radius:13px}
+
+  /* Layouts */
+  .grid,.grid-2,.grid-3,.scan-grid,.scan-food-grid,.assistant-wrap,.health-grid,.pain-grid,.measure-grid{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;width:100%!important}
+  .quick-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;width:100%!important}
+  .run-stats{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .scan-metrics{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .scan-photos{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+  .nutrition-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .assistant-topics{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .form-row{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+
+  /* Typography */
+  .page-title{font-size:25px!important;line-height:1.12;margin-bottom:4px}
+  .sub{font-size:12px!important;line-height:1.5}
+  .section-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .section-head h2{font-size:18px!important;line-height:1.2;margin:0;min-width:0}
+  h2,h3,p,span,label{overflow-wrap:anywhere}
+
+  /* Cards */
+  .hero{width:100%!important;min-height:390px!important;height:auto!important;border-radius:22px!important}
+  .hero-content{width:100%;padding:20px!important}
+  .hero h2{font-size:31px!important;line-height:1.02!important}
+  .hero p{font-size:12px!important;line-height:1.5;max-width:100%}
+  .stats{width:100%;min-height:112px;padding:15px!important;border-radius:18px}
+  .stat-value{font-size:27px!important}
+  .quick-card{min-width:0;padding:13px!important;border-radius:16px}
+  .quick-card b{font-size:20px!important}
+  .form-card,.scan-card,.health-card,.food-result,.map-card,.chat{width:100%;min-width:0;border-radius:18px!important;padding:15px!important}
+  .workout-card{width:100%;min-width:0;overflow:hidden;border-radius:18px}
+  .workout-img{width:100%;height:190px!important;object-fit:cover}
+  .workout-body{min-width:0;padding:14px}
+  .workout-body h3{font-size:17px}
+  .meta{flex-wrap:wrap;gap:8px}
+
+  /* Inputs/buttons */
+  input,select,textarea{box-sizing:border-box;width:100%;max-width:100%;min-width:0;font-size:14px!important}
+  button{max-width:100%;min-width:0}
+  .primary,.secondary{min-height:44px;max-width:100%;white-space:normal}
+  .form-card .primary,.form-card .secondary{width:100%}
+  .field{min-width:0;width:100%}
+  .field input,.field select,.field textarea{min-height:44px}
+
+  /* Bottom nav */
+  .mobile-nav{display:flex!important;position:fixed!important;left:50%!important;right:auto!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:calc(100% - 16px)!important;max-width:470px!important;height:64px!important;padding:5px!important;border-radius:20px!important;z-index:999!important;box-sizing:border-box;box-shadow:0 12px 35px rgba(0,0,0,.24)}
+  .mobile-nav button{flex:1 1 0!important;width:auto!important;min-width:0!important;height:54px!important;padding:5px 2px!important;border-radius:15px!important;font-size:8px!important;line-height:1.1!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;white-space:normal!important}
+  .mobile-nav svg{width:19px!important;height:19px!important;flex:0 0 auto}
+
+  /* Running */
+  .run-hero{width:100%!important;min-height:520px!important;border-radius:20px!important;overflow:hidden}
+  .run-content{min-height:520px!important;padding:14px!important}
+  .run-top{display:flex;flex-direction:column!important;gap:10px!important;width:100%}
+  .run-top>div{width:100%;min-width:0}
+  .run-top .icon-btn{align-self:flex-end;width:42px;height:42px}
+  .run-stats .run-stat{min-width:0;padding:10px 8px!important;border-radius:14px}
+  .run-stat b{font-size:20px!important}
+  .run-controls{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;width:100%}
+  .run-controls button{width:100%!important;min-width:0!important;min-height:44px}
+  .run-controls .primary{grid-column:1/-1}
+  .run-map,#runMap{width:100%!important;height:270px!important;min-height:270px!important;border-radius:18px!important;overflow:hidden}
+  .run-video{width:100%!important;height:100%!important;object-fit:cover}
+
+  /* Face camera */
+  .camera-box{width:100%!important;height:360px!important;min-height:360px!important;border-radius:18px!important;overflow:hidden}
+  #cameraVideo{width:100%!important;height:360px!important;object-fit:cover!important}
+  .camera-guide{width:58%!important;height:68%!important;min-width:135px!important;min-height:205px!important}
+  .camera-controls,.scan-actions{display:grid!important;grid-template-columns:1fr!important;gap:8px!important;width:100%}
+  .camera-controls button,.scan-actions button{width:100%!important;min-height:44px}
+  .scan-score{min-width:0}
+  .score-ring{width:62px!important;height:62px!important}
+
+  /* Food camera */
+  .food-camera{width:100%!important;height:300px!important;min-height:300px!important;border-radius:18px!important}
+  .food-camera video{width:100%!important;height:300px!important;object-fit:cover!important}
+  .food-product{grid-template-columns:68px minmax(0,1fr)!important;gap:10px!important}
+  .food-product img{width:68px!important;height:68px!important}
+  .nutrition-grid .nutri-box{min-width:0;padding:9px 6px}
+
+  /* Maps / gyms */
+  .location-bar,.gym-toolbar,.gym-actions{width:100%;min-width:0}
+  .location-bar,.gym-toolbar{display:grid!important;grid-template-columns:1fr!important;gap:8px!important}
+  .location-bar>* ,.gym-toolbar>*{width:100%!important;min-width:0!important}
+  .gym-count{width:max-content!important;max-width:100%;justify-self:start}
+  .gym-item{width:100%;min-width:0;padding:13px!important}
+  .gym-main{min-width:0;width:100%}
+  .gym-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important}
+  .gym-actions button{width:100%!important;min-width:0!important}
+  #gymMap{width:100%!important;height:270px!important;border-radius:18px!important;overflow:hidden}
+
+  /* Assistant */
+  .assistant-wrap{width:100%!important;min-width:0}
+  .assistant-topics{width:100%!important}
+  .assistant-topic{width:100%!important;min-width:0;min-height:58px;padding:10px!important;font-size:11px!important}
+  .chat{height:calc(100dvh - 245px)!important;min-height:430px!important;max-height:none!important;padding:0!important;overflow:hidden!important}
+  .chat-messages{min-width:0;padding:12px!important;overflow-y:auto;overflow-x:hidden}
+  .bubble{max-width:92%!important;min-width:0;font-size:12px!important;overflow-wrap:anywhere}
+  .chat-input{display:flex!important;align-items:center!important;width:100%;padding:8px!important;gap:6px!important}
+  .chat-input input{flex:1 1 auto!important;width:auto!important;min-width:0!important;height:44px!important}
+  .chat-input .primary{flex:0 0 44px!important;width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;font-size:0!important}
+  .chat-input .primary svg{margin:0!important}
+
+  /* Calendar */
+  .calendar{width:100%!important;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:3px!important}
+  .cal-day{width:100%!important;min-width:0!important;min-height:58px!important;padding:5px!important;border-radius:9px!important;overflow:hidden}
+  .cal-day b{font-size:11px!important}.cal-day span{font-size:7px!important;white-space:normal}
+
+  /* Profile / auth */
+  .profile-head{width:100%;min-width:0;padding:15px!important;border-radius:18px}
+  .profile-head h2{font-size:20px!important}
+  .profile-avatar-wrap,.profile-avatar-wrap .avatar{width:74px!important;height:74px!important;flex:0 0 74px}
+  .auth-screen{width:100vw!important;min-height:100dvh!important;padding:12px!important;box-sizing:border-box}
+  .auth-card{width:min(100%,430px)!important;max-width:430px!important;max-height:calc(100dvh - 24px)!important;overflow:auto!important;padding:20px!important;border-radius:22px!important}
+  .auth-card input{width:100%!important;min-height:46px!important}
+  .install-banner{width:100%;display:flex;flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+  .install-banner button{width:100%!important}
+
+  /* Modal / toast */
+  .modal-backdrop{padding:10px!important;align-items:flex-end!important}
+  .modal{width:100%!important;max-width:100%!important;max-height:92dvh!important;border-radius:22px!important;overflow:auto!important}
+  .toast{left:10px!important;right:10px!important;bottom:calc(80px + env(safe-area-inset-bottom))!important;width:auto!important;text-align:center}
+}
+@media(max-width:380px){
+  .main{padding-left:9px!important;padding-right:9px!important}
+  .mobile-nav{width:calc(100% - 10px)!important}
+  .mobile-nav button{font-size:7px!important}
+  .mobile-nav svg{width:17px!important;height:17px!important}
+  .hero{min-height:360px!important}
+  .hero h2{font-size:28px!important}
+  .quick-grid{gap:7px!important}
+  .quick-card{padding:11px!important}
+  .quick-card b{font-size:18px!important}
+  .run-stats{gap:6px!important}
+  .run-stat b{font-size:18px!important}
+  .assistant-topics{grid-template-columns:1fr!important}
+  .nutrition-grid{grid-template-columns:1fr 1fr!important}
+}
+
 </style>
 </head>
 <body>
