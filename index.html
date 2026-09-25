@@ -750,7 +750,7 @@ const recipes=[
 ];
 let currentRecipeFilter='all';
 let faceMesh=null,faceBusy=false,faceScanInterval=null;
-let cloudSaveTimer=null;function save(){localStorage.setItem('fitforge_state',JSON.stringify(state));if(typeof supa!=='undefined'&&supa&&window.FF_USER){clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(syncStateCloud,700)}else if(ffSessionUser){clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(syncLocalServerState,700)}}
+let cloudSaveTimer=null;function save(){localStorage.setItem('fitforge_state',JSON.stringify(state));if(ffSessionUser?.local){localStorage.setItem('fitforge_state_'+ffSessionUser.email,JSON.stringify(state));return}if(typeof supa!=='undefined'&&supa&&window.FF_USER){clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(syncStateCloud,700)}else if(ffSessionUser){clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(syncLocalServerState,700)}}
 async function syncStateCloud(){if(!supa||!window.FF_USER)return;try{await supa.from('user_state').upsert({user_id:window.FF_USER.id,state_json:state,updated_at:new Date().toISOString()},{onConflict:'user_id'})}catch(e){console.warn('Cloud sync:',e)}}
 async function syncLocalServerState(){if(!ffSessionUser)return;try{await fetch(FF.stateEndpoint||'/api/me/state',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({state})})}catch(e){console.warn('Servidor FITFORGE:',e)}}
 function money(n){return Math.round(n).toLocaleString('es-NI')}
@@ -759,7 +759,7 @@ function showView(id){
  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
  window.scrollTo({top:0,behavior:'smooth'}); if(id!=='scan')stopAutoFaceScan();
- if(id==='workouts')renderWorkouts(); if(id==='progress')renderProgress(); if(id==='notifications')renderNotifications(); if(id==='gyms')initGymMap(); if(id==='scan')renderScan(); if(id==='recipes')renderRecipes(); if(id==='nutrition')renderNutrition(); if(id==='water')renderWater(); if(id==='goals')renderGoals(); if(id==='run'){initRunMap();renderRunHistory();setTimeout(()=>runMap?.invalidateSize(),100)} if(id==='foodscan'){stopFoodCamera();document.getElementById('notificationPermission')?.removeAttribute('data-x')} if(id==='calendar')renderCalendar(); if(id==='assistant')renderChat(); if(id==='health')renderWellness();
+ if(id==='workouts')renderWorkouts(); if(id==='scan'){initFaceMesh().catch(()=>{});renderScan();} if(id==='progress')renderProgress(); if(id==='notifications')renderNotifications(); if(id==='gyms'){initGymMap();setTimeout(()=>gymMap?.invalidateSize(),80)}; if(id==='recipes')renderRecipes(); if(id==='nutrition')renderNutrition(); if(id==='water')renderWater(); if(id==='goals')renderGoals(); if(id==='run'){initRunMap();renderRunHistory();setTimeout(()=>runMap?.invalidateSize(),100)} if(id==='foodscan'){stopFoodCamera();document.getElementById('notificationPermission')?.removeAttribute('data-x')} if(id==='calendar')renderCalendar(); if(id==='assistant')renderChat(); if(id==='health')renderWellness();
 }
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 
@@ -863,7 +863,7 @@ async function initFaceMesh(){
    if(typeof FaceMesh==='undefined')throw new Error('FaceMesh unavailable');
    faceMesh=new FaceMesh({locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
    faceMesh.setOptions({maxNumFaces:1,refineLandmarks:false,minDetectionConfidence:.35,minTrackingConfidence:.35});
-   faceMesh.onResults(res=>{faceBusy=false;const lm=res.multiFaceLandmarks?.[0];if(!lm){setFaceUI(null);return} const m=faceMetrics(lm);state.scan.lastFace=m;setFaceUI(m);});
+   faceMesh.onResults(res=>{const lm=res.multiFaceLandmarks?.[0];if(!lm){setFaceUI(null);faceMesh.__fitforgeOnce?.(false);return} const m=faceMetrics(lm);state.scan.lastFace=m;setFaceUI(m);faceMesh.__fitforgeOnce?.(true);});
    return faceMesh;
  }).catch(e=>{faceMeshPromise=null;throw e});
  return faceMeshPromise;
@@ -886,11 +886,27 @@ function setFaceUI(m){
  dot.classList.add('ok');status.textContent='Rostro detectado · sensor activo';guide?.classList.remove('scanning');guide?.classList.add('detected');if(sensorText)sensorText.textContent=`ROSTRO DETECTADO · ${m.score}%`;
  document.getElementById('faceDetected').textContent='Sí';document.getElementById('faceFraming').textContent=m.framing?'Correcto':'Ajustar';document.getElementById('faceOrientation').textContent=m.orientation;document.getElementById('faceQuality').textContent=`${m.quality} · ${m.score}/100`;
  const v=document.getElementById('scanVerdict');if(v){let comparison=faceComparison();let cmp=comparison!==null?`<br><b>Comparación geométrica:</b> ${comparison<5?'muy estable':comparison<12?'cambio leve':'cambio visible'} (${comparison}% de variación relativa entre rasgos normalizados).`:'';v.innerHTML=`<b>Resultado del escaneo: ${m.score}/100</b><p style="margin:6px 0 0">Rostro detectado, encuadre ${m.framing?'válido':'mejorable'} y orientación ${escapeHTML(m.orientation.toLowerCase())}. Este resultado mide la calidad de la captura y rasgos geométricos visibles; no diagnostica salud ni calcula grasa corporal.</p>${cmp}`}}
-async function startAutoFaceScan(){if(faceScanInterval)clearInterval(faceScanInterval);faceScanInterval=setInterval(()=>{if(document.getElementById('cameraVideo')?.srcObject&&!faceBusy)analyzeLiveFace(true)},350)}
+async function startAutoFaceScan(){if(faceScanInterval)clearInterval(faceScanInterval);faceScanInterval=setInterval(()=>{if(document.getElementById('cameraVideo')?.srcObject&&!faceBusy)analyzeLiveFace(true)},500)}
 function stopAutoFaceScan(){if(faceScanInterval)clearInterval(faceScanInterval);faceScanInterval=null}
 async function analyzeLiveFace(silent=false){
- try{await initFaceMesh()}catch(e){if(!silent)toast('No se pudo cargar el sensor facial. Comprueba tu conexión.');return false} if(!faceMesh){if(!silent)toast('No se pudo cargar el sensor facial.');return false}
- const video=document.getElementById('cameraVideo');if(!video.srcObject||video.readyState<2){if(!silent)toast('Primero abre la cámara');return false} if(faceBusy)return !!state.scan.lastFace;faceBusy=true;try{state.scan.lastFace=null;await faceMesh.send({image:video});const ok=!!state.scan.lastFace;if(!silent)toast(ok?'✓ Rostro escaneado':'No se detectó un rostro');return ok}catch(e){faceBusy=false;if(!silent)toast('No se pudo analizar la cámara');return false}}
+ try{await initFaceMesh()}catch(e){if(!silent)toast('No se pudo cargar el sensor facial. Comprueba tu conexión.');return false}
+ if(!faceMesh){if(!silent)toast('No se pudo cargar el sensor facial.');return false}
+ const video=document.getElementById('cameraVideo');
+ if(!video.srcObject||video.readyState<2){if(!silent)toast('Primero abre la cámara');return false}
+ if(faceBusy)return !!state.scan.lastFace;
+ faceBusy=true;state.scan.lastFace=null;
+ try{
+   const ok=await new Promise(async resolve=>{
+     let done=false;const finish=v=>{if(done)return;done=true;resolve(v)};
+     const timeout=setTimeout(()=>finish(false),1800);
+     const previous=faceMesh.__fitforgeOnce;
+     faceMesh.__fitforgeOnce=(has)=>{clearTimeout(timeout);faceMesh.__fitforgeOnce=null;finish(has)};
+     try{await faceMesh.send({image:video})}catch(e){clearTimeout(timeout);faceMesh.__fitforgeOnce=null;finish(false)}
+   });
+   if(!silent)toast(ok?'✓ Rostro escaneado':'Acerca o centra el rostro dentro del sensor');
+   return ok;
+ }finally{faceBusy=false}
+}
 function captureFaceAnalysis(type){return analyzeLiveFace().then(ok=>{if(ok&&state.scan.lastFace){state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));save();}})}
 function todayKey(){return new Date().toISOString().slice(0,10)}
 function addWater(ml){state.water+=ml;save();renderWater();renderStats();toast(`+${ml} ml de agua`)}
@@ -998,9 +1014,13 @@ const dailyTips=[
 ];
 function configReady(){return !!supa || !!FF.authEndpoint}
 function setAuthMode(mode){currentAuthMode=mode;document.getElementById('loginTab').classList.toggle('active',mode==='login');document.getElementById('registerTab').classList.toggle('active',mode==='register');document.getElementById('authNameWrap').style.display=mode==='register'?'block':'none';document.getElementById('authSubmit').textContent=mode==='register'?'Crear cuenta':'Iniciar sesión';document.getElementById('authStatus').textContent=''}
+async function hashLocalPassword(value){const data=new TextEncoder().encode(value);const digest=await crypto.subtle.digest('SHA-256',data);return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function localUsers(){try{return JSON.parse(localStorage.getItem('fitforge_users')||'{}')}catch{return {}}}
 async function initAuth(){
   if(supa){const {data}=await supa.auth.getSession();if(data.session){window.FF_USER=data.session.user;hideAuth();await loadCloudProfile(data.session.user)}else document.getElementById('authScreen').classList.remove('hidden');supa.auth.onAuthStateChange((_e,session)=>{if(session){window.FF_USER=session.user;hideAuth();loadCloudProfile(session.user)}else document.getElementById('authScreen').classList.remove('hidden')});return}
-  try{const r=await fetch(FF.authEndpoint+'/me');const d=await r.json();if(d.user){ffSessionUser=d.user;window.FF_USER=d.user;hideAuth();await loadLocalServerProfile()}else document.getElementById('authScreen').classList.remove('hidden')}catch(e){document.getElementById('authScreen').classList.remove('hidden');document.getElementById('authStatus').textContent='Servidor no disponible. Puedes usar modo invitado.'}
+  const localEmail=localStorage.getItem('fitforge_local_session');
+  if(localEmail){const u=localUsers()[localEmail];if(u){ffSessionUser={...u,local:true};window.FF_USER=ffSessionUser;const saved=localStorage.getItem('fitforge_state_'+localEmail);if(saved)try{state=Object.assign(state,JSON.parse(saved))}catch{}hideAuth();return}}
+  try{const r=await fetch(FF.authEndpoint+'/me',{credentials:'same-origin'});const d=await r.json();if(d.user){ffSessionUser=d.user;window.FF_USER=d.user;hideAuth();await loadLocalServerProfile()}else document.getElementById('authScreen').classList.remove('hidden')}catch(e){document.getElementById('authScreen').classList.remove('hidden');document.getElementById('authStatus').textContent='Puedes crear tu cuenta ahora. Si el servidor está online, la cuenta quedará guardada en la nube; si no, se guardará de forma local en este dispositivo.'}
 }
 function hideAuth(){document.getElementById('authScreen').classList.add('hidden');welcomeNotification();renderStats();renderProfile?.();}
 async function submitAuth(){
@@ -1008,10 +1028,25 @@ async function submitAuth(){
  if(!email||password.length<8){document.getElementById('authStatus').textContent='Introduce un correo válido y una contraseña de al menos 8 caracteres.';return}
  if(supa){document.getElementById('authStatus').textContent='Conectando…';try{let r;if(currentAuthMode==='register')r=await supa.auth.signUp({email,password,options:{data:{name:name||'Usuario FITFORGE'}}});else r=await supa.auth.signInWithPassword({email,password});if(r.error)throw r.error;if(currentAuthMode==='register'&&!r.data.session){document.getElementById('authStatus').textContent='Cuenta creada. Revisa tu correo si la confirmación está activada.'}else hideAuth()}catch(e){document.getElementById('authStatus').textContent=e.message||'No se pudo iniciar sesión.'}return}
  document.getElementById('authStatus').textContent='Conectando…';
- try{const endpoint=currentAuthMode==='register'?'/register':'/login';const r=await fetch(FF.authEndpoint+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password,name})});const d=await r.json();if(!r.ok)throw new Error(d.error||'No se pudo autenticar');ffSessionUser=d.user;window.FF_USER=d.user;state.name=d.user.name||state.name;state.email=d.user.email||state.email;save();hideAuth();await loadLocalServerProfile();toast(currentAuthMode==='register'?'✓ Cuenta creada':'✓ Sesión iniciada')}catch(e){document.getElementById('authStatus').textContent=e.message||'No se pudo iniciar sesión.'}
+ try{
+   const endpoint=currentAuthMode==='register'?'/register':'/login';
+   const r=await fetch(FF.authEndpoint+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email,password,name})});
+   const d=await r.json();
+   if(!r.ok)throw new Error(d.error||'No se pudo autenticar');
+   ffSessionUser=d.user;window.FF_USER=d.user;state.name=d.user.name||state.name;state.email=d.user.email||state.email;save();hideAuth();await loadLocalServerProfile();toast(currentAuthMode==='register'?'✓ Cuenta creada':'✓ Sesión iniciada')
+ }catch(e){
+   const users=localUsers();const key=email.toLowerCase();const pass=await hashLocalPassword(password);
+   if(currentAuthMode==='register'){
+     if(users[key]){document.getElementById('authStatus').textContent='Ya existe una cuenta con ese correo en este dispositivo.';return}
+     const u={id:'local-'+crypto.randomUUID(),name:name||'Usuario FITFORGE',email:key,passwordHash:pass,createdAt:new Date().toISOString()};users[key]=u;localStorage.setItem('fitforge_users',JSON.stringify(users));localStorage.setItem('fitforge_local_session',key);ffSessionUser={...u,local:true};window.FF_USER=ffSessionUser;state.name=u.name;state.email=u.email;localStorage.setItem('fitforge_state_'+key,JSON.stringify(state));hideAuth();toast('✓ Cuenta creada en este dispositivo')
+   }else{
+     const u=users[key];if(!u||u.passwordHash!==pass){document.getElementById('authStatus').textContent='Correo o contraseña incorrectos.';return}
+     localStorage.setItem('fitforge_local_session',key);ffSessionUser={...u,local:true};window.FF_USER=ffSessionUser;const saved=localStorage.getItem('fitforge_state_'+key);if(saved)try{state=Object.assign(state,JSON.parse(saved))}catch{}state.name=u.name;state.email=u.email;hideAuth();toast('✓ Sesión iniciada')
+   }
+ }
 }
 function continueGuest(){window.FF_GUEST=true;ffSessionUser=null;hideAuth();toast('Modo invitado activo: datos solo en este dispositivo')}
-async function logout(){try{if(supa)await supa.auth.signOut();else await fetch((FF.authEndpoint||'/api/auth')+'/logout',{method:'POST'})}catch{}window.FF_USER=null;ffSessionUser=null;location.reload()}
+async function logout(){try{if(supa)await supa.auth.signOut();else if(ffSessionUser?.local)localStorage.removeItem('fitforge_local_session');else await fetch((FF.authEndpoint||'/api/auth')+'/logout',{method:'POST',credentials:'same-origin'})}catch{}window.FF_USER=null;ffSessionUser=null;location.reload()}
 async function loadCloudProfile(user){try{const {data:cloud}=await supa.from('user_state').select('state_json').eq('user_id',user.id).maybeSingle();if(cloud?.state_json){state=Object.assign(state,cloud.state_json);localStorage.setItem('fitforge_state',JSON.stringify(state))}const {data}=await supa.from('profiles').select('*').eq('id',user.id).maybeSingle();if(data){Object.assign(state,{name:data.name||state.name,email:user.email||state.email,weight:Number(data.weight)||state.weight,goal:data.goal||state.goal,avatar:data.avatar_url||state.avatar});localStorage.setItem('fitforge_state',JSON.stringify(state))}renderStats();renderProgress();renderScan();renderNutrition();renderRunHistory();renderNotifications();renderProfile?.()}catch(e){console.warn(e)}}
 async function loadLocalServerProfile(){try{const r=await fetch(FF.stateEndpoint||'/api/me/state');if(!r.ok)return;const d=await r.json();if(d.state&&typeof d.state==='object'){state=Object.assign(JSON.parse(JSON.stringify(defaultState)),d.state);state.scan=state.scan||{before:null,after:null,beforeWeight:null,afterWeight:null,beforeFace:null,afterFace:null,lastFace:null,beforeShape:null,afterShape:null};state.runs=Array.isArray(state.runs)?state.runs:[];state.chat=Array.isArray(state.chat)?state.chat:[];state.foods=Array.isArray(state.foods)?state.foods:[];localStorage.setItem('fitforge_state',JSON.stringify(state))}renderStats();renderProgress();renderScan();renderNutrition();renderRunHistory();renderNotifications();renderProfile?.();renderChat()}catch(e){console.warn('Carga de cuenta:',e)}}
 async function changeAvatar(ev){const file=ev.target.files?.[0];if(!file)return;if(file.size>3*1024*1024){toast('La foto debe pesar menos de 3 MB');return}const reader=new FileReader();reader.onload=async()=>{state.avatar=reader.result;save();renderStats();renderProfile?.();toast('✓ Foto de perfil actualizada');if(supa&&window.FF_USER){try{const path=`${window.FF_USER.id}/avatar-${Date.now()}.${file.name.split('.').pop()||'jpg'}`;const {error}=await supa.storage.from('avatars').upload(path,file,{upsert:true});if(!error){const {data}=supa.storage.from('avatars').getPublicUrl(path);state.avatar=data.publicUrl;save();renderStats();await supa.from('profiles').upsert({id:window.FF_USER.id,name:state.name,avatar_url:data.publicUrl},{onConflict:'id'})}}catch(e){console.warn(e)}}else if(ffSessionUser){try{await fetch(FF.profileEndpoint||'/api/me/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:state.name,avatar:state.avatar})})}catch(e){console.warn(e)}}};reader.readAsDataURL(file)}

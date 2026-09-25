@@ -31,6 +31,15 @@ const server=http.createServer(async(req,res)=>{
  try{
   const u=new URL(req.url,`http://${req.headers.host||'localhost'}`);const p=u.pathname;
   if(p==='/api/health'){return json(res,200,{ok:true,service:'FITFORGE',time:new Date().toISOString()})}
+  if(p==='/api/gyms' && req.method==='GET'){
+    const lat=Number(u.searchParams.get('lat')), lon=Number(u.searchParams.get('lon')), radius=Math.min(50000,Math.max(1000,Number(u.searchParams.get('radius'))||10000));
+    if(!Number.isFinite(lat)||!Number.isFinite(lon))return json(res,400,{error:'Ubicación no válida'});
+    const q=`[out:json][timeout:18];(nwr["leisure"="fitness_centre"](around:${radius},${lat},${lon});nwr["amenity"="gym"](around:${radius},${lat},${lon});nwr["sport"~"fitness|gym|bodybuilding",i](around:${radius},${lat},${lon});nwr["leisure"="sports_centre"]["name"](around:${radius},${lat},${lon}););out center tags;`;
+    const endpoints=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://overpass.private.coffee/api/interpreter'];
+    let last='';
+    for(const endpoint of endpoints){try{const rr=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','User-Agent':'FITFORGE/1.0'},body:new URLSearchParams({data:q}),signal:AbortSignal.timeout(20000)});if(!rr.ok){last=`HTTP ${rr.status}`;continue}const data=await rr.json();return json(res,200,data)}catch(e){last=e.message||'Overpass error'}}
+    return json(res,502,{error:'No se pudo consultar los datos de gimnasios',detail:last});
+  }
   if(p==='/api/auth/me'){const x=userFor(req);return json(res,200,{user:x?safeUser(x):null})}
   if(p==='/api/auth/logout'){const secure=process.env.NODE_ENV==='production'?' Secure;':'';res.setHeader('Set-Cookie',`ff_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0;${secure}`);return json(res,200,{ok:true})}
   if((p==='/api/auth/register'||p==='/api/auth/login')&&req.method==='POST'){
