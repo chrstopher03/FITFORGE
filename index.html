@@ -43,15 +43,15 @@ button{cursor:pointer;border:0}
 .side-card b{display:block;font-size:14px}.side-card span{font-size:12px;color:#bfc1c5}
 .side-progress{height:6px;background:#34363b;border-radius:10px;overflow:hidden;margin:14px 0 8px}.side-progress i{display:block;width:70%;height:100%;background:var(--orange)}
 .user-mini{display:flex;align-items:center;gap:10px;padding:12px 7px 0}.avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#eee}.user-mini div:last-child{font-size:12px;color:#888}.user-mini strong{font-size:13px}
-.main{margin-left:250px;padding:28px 42px 50px;min-height:100vh}
+.main{margin-left:250px;padding:28px 42px 50px;min-height:100vh;width:calc(100% - 250px);max-width:calc(100% - 250px);overflow-x:hidden}
 .topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:25px}
 .greeting small{display:block;color:#777;font-size:12px;margin-bottom:4px}.greeting h1{margin:0;font-size:29px;letter-spacing:-1px}
 .top-actions{display:flex;gap:10px;align-items:center}
 .icon-btn{width:44px;height:44px;border-radius:14px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;position:relative}
 .dot{position:absolute;width:8px;height:8px;background:var(--orange);border:2px solid #fff;border-radius:50%;right:9px;top:8px}
 .view{display:none}.view.active{display:block}
-.grid{display:grid;gap:20px}
-.grid-3{grid-template-columns:repeat(3,1fr)}.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid{display:grid;gap:20px;min-width:0}.grid>*{min-width:0}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .hero{min-height:350px;border-radius:28px;overflow:hidden;position:relative;background:#151619 center/cover no-repeat;box-shadow:var(--shadow);display:flex;align-items:flex-end}
 .hero:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.8),rgba(0,0,0,.05) 70%)}
 .hero-content{position:relative;z-index:2;color:#fff;padding:28px;max-width:650px}
@@ -109,7 +109,7 @@ button{cursor:pointer;border:0}
 .scan-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
 .camera-box{background:#101114;border-radius:20px;overflow:hidden;position:relative;min-height:330px;display:grid;place-items:center}
 #cameraVideo{width:100%;height:330px;object-fit:cover;display:block;background:#0b0b0d}
-.camera-guide{position:absolute;width:190px;height:250px;border:2px dashed rgba(255,255,255,.7);border-radius:48% 48% 44% 44%;pointer-events:none}
+.camera-guide{position:absolute;width:min(54%,260px);height:min(72%,330px);min-width:150px;min-height:210px;border:2px dashed rgba(255,255,255,.72);border-radius:48% 48% 44% 44%;pointer-events:none;display:grid;place-items:end center;padding-bottom:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.12),0 0 35px rgba(255,90,0,.08);transition:.2s}.camera-guide.scanning{border-color:#ff7a1a;box-shadow:0 0 0 9999px rgba(0,0,0,.16),0 0 30px rgba(255,90,0,.45)}.camera-guide.detected{border-color:#31a66b;box-shadow:0 0 0 9999px rgba(0,0,0,.08),0 0 30px rgba(49,166,107,.42)}.face-sensor{display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.72);color:#fff;border-radius:99px;padding:8px 12px;font-size:9px;font-weight:900;letter-spacing:.5px;backdrop-filter:blur(8px)}.face-sensor i{width:7px;height:7px;border-radius:50%;background:#ffb000;box-shadow:0 0 0 0 rgba(255,176,0,.5);animation:sensorPulse 1.2s infinite}.camera-guide.detected .face-sensor i{background:#31a66b;animation:none}@keyframes sensorPulse{to{box-shadow:0 0 0 9px rgba(255,176,0,0)}}
 .camera-controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
 .scan-photos{display:grid;grid-template-columns:1fr 1fr;gap:12px}.scan-photo{background:#f4f4f2;border-radius:18px;overflow:hidden;min-height:190px;display:flex;align-items:center;justify-content:center;position:relative}.scan-photo img{width:100%;height:230px;object-fit:cover}.scan-photo.empty{color:#999;font-size:12px;text-align:center;padding:20px}
 .scan-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px}.scan-metric{background:#f7f7f5;border-radius:15px;padding:13px}.scan-metric small{display:block;color:#888;font-size:10px}.scan-metric b{display:block;font-size:20px;margin-top:4px}
@@ -132,7 +132,7 @@ button{cursor:pointer;border:0}
 @media(max-width:800px){.face-grid{grid-template-columns:1fr 1fr}.recipe-card img{height:190px}}
 
 /* ===== FITFORGE 2.0: auth, run, food scanner, calendar, assistant, wellness ===== */
-.auth-screen{position:fixed;inset:0;background:radial-gradient(circle at 20% 10%,rgba(255,90,0,.2),transparent 35%),#101114;display:grid;place-items:center;z-index:1000;padding:18px}.auth-screen.hidden{display:none}.auth-card{width:min(460px,100%);background:#fff;border-radius:28px;padding:28px;box-shadow:0 30px 90px rgba(0,0,0,.35)}.auth-logo{display:flex;align-items:center;gap:10px;font-size:25px;font-weight:900;margin-bottom:20px}.auth-logo span{width:40px;height:40px;border-radius:13px;background:var(--orange);color:#fff;display:grid;place-items:center}.auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:#f3f3f1;padding:4px;border-radius:13px;margin:18px 0}.auth-tabs button{padding:10px;border-radius:10px;background:transparent;font-weight:800;color:#777}.auth-tabs button.active{background:#fff;color:var(--orange);box-shadow:0 2px 10px rgba(0,0,0,.06)}.auth-note{font-size:11px;color:#777;line-height:1.5}.auth-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.auth-actions button{flex:1}.install-banner{display:none;align-items:center;justify-content:space-between;gap:12px;background:#111;color:#fff;border-radius:18px;padding:13px 15px;margin:0 0 18px}.install-banner.show{display:flex}.install-banner p{margin:0;font-size:12px}.install-banner small{color:#aaa}.install-banner button{flex:none}.run-hero{background:#111;color:#fff;border-radius:26px;overflow:hidden;position:relative;min-height:420px}.run-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.48;display:none}.run-video.on{display:block}.run-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.88));pointer-events:none}.run-content{position:relative;z-index:2;padding:22px;min-height:420px;display:flex;flex-direction:column;justify-content:space-between}.run-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.run-badge{display:inline-flex;gap:6px;align-items:center;padding:7px 10px;border-radius:99px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);font-size:11px}.run-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.run-stat{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:13px}.run-stat small{display:block;color:#bbb;font-size:10px}.run-stat b{display:block;font-size:24px;margin-top:4px}.run-controls{display:flex;gap:9px;flex-wrap:wrap}.run-controls button{min-width:120px}.run-map{height:420px;border-radius:24px;overflow:hidden;border:1px solid var(--line)}.run-list{display:grid;gap:10px}.run-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--line);background:#fff;border-radius:16px}.run-row small{color:#888}.scan-food-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.food-camera{background:#101114;border-radius:22px;overflow:hidden;position:relative;min-height:360px}.food-camera video{width:100%;height:360px;object-fit:cover;display:block}.scan-cross{position:absolute;inset:18% 12%;border:2px dashed rgba(255,255,255,.8);border-radius:22px;pointer-events:none}.food-result{min-height:360px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px}.food-product{display:grid;grid-template-columns:90px 1fr;gap:14px;align-items:center}.food-product img{width:90px;height:90px;object-fit:cover;border-radius:16px;background:#f3f3f1}.nutrition-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px}.nutri-box{background:#f7f7f5;border-radius:14px;padding:12px}.nutri-box small{display:block;color:#888;font-size:10px}.nutri-box b{display:block;margin-top:4px;font-size:16px}.calendar-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.cal-head{font-size:10px;color:#888;text-align:center;padding:6px}.cal-day{min-height:72px;border:1px solid var(--line);background:#fff;border-radius:13px;padding:8px;text-align:left}.cal-day.muted{opacity:.4}.cal-day.today{border:2px solid var(--orange)}.cal-day b{font-size:12px}.cal-day span{display:block;margin-top:10px;font-size:9px;color:#888;line-height:1.25}.tip-card{background:#111;color:#fff;border-radius:22px;padding:20px}.tip-card .tip-date{color:#aaa;font-size:11px}.tip-card h3{margin:7px 0}.assistant-wrap{display:grid;grid-template-columns:260px 1fr;gap:15px}.assistant-topics{display:grid;gap:8px}.assistant-topic{background:#fff;border:1px solid var(--line);padding:12px;border-radius:14px;text-align:left;font-weight:700}.chat{background:#fff;border:1px solid var(--line);border-radius:22px;min-height:520px;display:flex;flex-direction:column;overflow:hidden}.chat-messages{flex:1;padding:18px;display:grid;align-content:start;gap:10px;overflow:auto}.bubble{max-width:82%;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5}.bubble.ai{background:#f4f4f2;justify-self:start}.bubble.user{background:var(--orange);color:#fff;justify-self:end}.chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}.chat-input input{flex:1;border:1px solid var(--line);border-radius:13px;padding:12px;outline:0}.health-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.health-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:17px}.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pain-btn{background:#f7f7f5;border:1px solid var(--line);padding:14px;border-radius:15px;text-align:left;font-weight:800}.pain-btn:hover{border-color:var(--orange)}.pain-result{margin-top:14px;background:#fff8f3;border:1px solid #ffe0cd;border-radius:18px;padding:15px;font-size:12px;line-height:1.55}.profile-avatar-wrap{position:relative;width:92px;height:92px}.profile-avatar-wrap .avatar{width:92px;height:92px}.avatar-edit{position:absolute;right:-3px;bottom:-3px;width:32px;height:32px;border-radius:10px;background:var(--orange);color:#fff;display:grid;place-items:center;border:3px solid #fff}.source-note{font-size:10px;color:#888;line-height:1.45}.hidden-input{display:none}.scan-verdict{background:#fff8f3;border:1px solid #ffe0cd;border-radius:15px;padding:12px;font-size:12px;line-height:1.5}.food-ai-box label.primary{display:inline-flex;align-items:center;gap:7px}
+.auth-screen{position:fixed;inset:0;background:radial-gradient(circle at 20% 10%,rgba(255,90,0,.2),transparent 35%),#101114;display:grid;place-items:center;z-index:1000;padding:18px}.auth-screen.hidden{display:none}.auth-card{width:min(460px,100%);background:#fff;border-radius:28px;padding:28px;box-shadow:0 30px 90px rgba(0,0,0,.35)}.auth-logo{display:flex;align-items:center;gap:10px;font-size:25px;font-weight:900;margin-bottom:20px}.auth-logo span{width:40px;height:40px;border-radius:13px;background:var(--orange);color:#fff;display:grid;place-items:center}.auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:#f3f3f1;padding:4px;border-radius:13px;margin:18px 0}.auth-tabs button{padding:10px;border-radius:10px;background:transparent;font-weight:800;color:#777}.auth-tabs button.active{background:#fff;color:var(--orange);box-shadow:0 2px 10px rgba(0,0,0,.06)}.auth-note{font-size:11px;color:#777;line-height:1.5}.auth-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.auth-actions button{flex:1}.install-banner{display:none;align-items:center;justify-content:space-between;gap:12px;background:#111;color:#fff;border-radius:18px;padding:13px 15px;margin:0 0 18px}.install-banner.show{display:flex}.install-banner p{margin:0;font-size:12px}.install-banner small{color:#aaa}.install-banner button{flex:none}.run-hero{background:#111;color:#fff;border-radius:26px;overflow:hidden;position:relative;min-height:420px}.run-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.48;display:none}.run-video.on{display:block}.run-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.88));pointer-events:none}.run-content{position:relative;z-index:2;padding:22px;min-height:420px;display:flex;flex-direction:column;justify-content:space-between}.run-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;min-width:0}.run-top>div{min-width:0}.run-badge{display:inline-flex;gap:6px;align-items:center;padding:7px 10px;border-radius:99px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);font-size:11px}.run-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.run-stat{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:13px}.run-stat small{display:block;color:#bbb;font-size:10px}.run-stat b{display:block;font-size:24px;margin-top:4px}.run-controls{display:flex;gap:9px;flex-wrap:wrap}.run-controls button{min-width:120px}.run-map{height:420px;border-radius:24px;overflow:hidden;border:1px solid var(--line)}.run-list{display:grid;gap:10px}.run-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--line);background:#fff;border-radius:16px}.run-row small{color:#888}.scan-food-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.food-camera{background:#101114;border-radius:22px;overflow:hidden;position:relative;min-height:360px}.food-camera video{width:100%;height:360px;object-fit:cover;display:block}.scan-cross{position:absolute;inset:18% 12%;border:2px dashed rgba(255,255,255,.8);border-radius:22px;pointer-events:none}.food-result{min-height:360px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px}.food-product{display:grid;grid-template-columns:90px 1fr;gap:14px;align-items:center}.food-product img{width:90px;height:90px;object-fit:cover;border-radius:16px;background:#f3f3f1}.nutrition-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px}.nutri-box{background:#f7f7f5;border-radius:14px;padding:12px}.nutri-box small{display:block;color:#888;font-size:10px}.nutri-box b{display:block;margin-top:4px;font-size:16px}.calendar-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.cal-head{font-size:10px;color:#888;text-align:center;padding:6px}.cal-day{min-height:72px;border:1px solid var(--line);background:#fff;border-radius:13px;padding:8px;text-align:left}.cal-day.muted{opacity:.4}.cal-day.today{border:2px solid var(--orange)}.cal-day b{font-size:12px}.cal-day span{display:block;margin-top:10px;font-size:9px;color:#888;line-height:1.25}.tip-card{background:#111;color:#fff;border-radius:22px;padding:20px}.tip-card .tip-date{color:#aaa;font-size:11px}.tip-card h3{margin:7px 0}.assistant-wrap{display:grid;grid-template-columns:260px 1fr;gap:15px}.assistant-topics{display:grid;gap:8px}.assistant-topic{background:#fff;border:1px solid var(--line);padding:12px;border-radius:14px;text-align:left;font-weight:700}.chat{background:#fff;border:1px solid var(--line);border-radius:22px;min-height:520px;display:flex;flex-direction:column;overflow:hidden}.chat-messages{flex:1;padding:18px;display:grid;align-content:start;gap:10px;overflow:auto}.bubble{max-width:82%;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5}.bubble.ai{background:#f4f4f2;justify-self:start}.bubble.user{background:var(--orange);color:#fff;justify-self:end}.chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}.chat-input input{flex:1;border:1px solid var(--line);border-radius:13px;padding:12px;outline:0}.health-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.health-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:17px}.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pain-btn{background:#f7f7f5;border:1px solid var(--line);padding:14px;border-radius:15px;text-align:left;font-weight:800}.pain-btn:hover{border-color:var(--orange)}.pain-result{margin-top:14px;background:#fff8f3;border:1px solid #ffe0cd;border-radius:18px;padding:15px;font-size:12px;line-height:1.55}.profile-avatar-wrap{position:relative;width:92px;height:92px}.profile-avatar-wrap .avatar{width:92px;height:92px}.avatar-edit{position:absolute;right:-3px;bottom:-3px;width:32px;height:32px;border-radius:10px;background:var(--orange);color:#fff;display:grid;place-items:center;border:3px solid #fff}.source-note{font-size:10px;color:#888;line-height:1.45}.hidden-input{display:none}.scan-verdict{background:#fff8f3;border:1px solid #ffe0cd;border-radius:15px;padding:12px;font-size:12px;line-height:1.5}.food-ai-box label.primary{display:inline-flex;align-items:center;gap:7px}
 @media(max-width:900px){.assistant-wrap{grid-template-columns:1fr}.assistant-topics{grid-template-columns:repeat(2,1fr)}.scan-food-grid{grid-template-columns:1fr}.run-map{height:320px}.health-grid{grid-template-columns:1fr 1fr}.nutrition-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:650px){.run-stats{grid-template-columns:1fr 1fr}.run-stat:last-child{grid-column:1/-1}.run-hero,.run-content{min-height:500px}.food-camera,.food-camera video{min-height:300px;height:300px}.calendar{gap:4px}.cal-day{min-height:62px;padding:6px}.cal-day span{font-size:8px}.health-grid,.pain-grid{grid-template-columns:1fr}.assistant-topics{grid-template-columns:1fr 1fr}.install-banner{align-items:flex-start}.install-banner button{padding:9px 12px}}
 
@@ -202,7 +202,7 @@ button,input,select,textarea{max-width:100%}
     <div class="field" style="margin-top:10px"><label>Contraseña</label><input id="authPassword" type="password" placeholder="Mínimo 6 caracteres" autocomplete="current-password"></div>
     <div class="auth-actions"><button class="primary" onclick="submitAuth()" id="authSubmit">Iniciar sesión</button><button class="secondary" onclick="continueGuest()">Probar sin cuenta</button></div>
     <p id="authStatus" class="auth-note" style="margin-top:12px"></p>
-    <p class="auth-note">Las cuentas reales requieren configurar Supabase en <b>config.js</b>. Sin esa configuración, el modo invitado guarda datos solo en este navegador.</p>
+    <p class="auth-note">Puedes crear una cuenta directamente en FITFORGE. La aplicación guarda tu cuenta y progreso en el servidor incluido. Si no hay servidor, puedes usar el modo invitado.</p>
   </div>
 </div>
 <div class="app">
@@ -287,6 +287,7 @@ button,input,select,textarea{max-width:100%}
       <p class="sub">Encuentra centros deportivos alrededor de tu ubicación actual.</p>
       <div class="location-bar">
         <button class="primary" onclick="findGyms()"><i data-lucide="locate-fixed"></i> Usar mi ubicación</button>
+        <button class="secondary" onclick="findSomotoGyms()"><i data-lucide="map-pin"></i> Somoto, Madriz</button>
         <div class="location-status" id="locationStatus">Ubicación no consultada</div>
       </div>
       <div class="gym-toolbar"><select id="gymRadius"><option value="5000">5 km</option><option value="10000" selected>10 km</option><option value="20000">20 km</option><option value="50000">50 km</option></select><span class="gym-count" id="gymCount">0 gimnasios encontrados</span></div>
@@ -310,7 +311,7 @@ button,input,select,textarea{max-width:100%}
           <p style="font-size:12px;color:#888">Coloca tu rostro dentro de la guía y mantén una distancia y luz similares cada vez.</p>
           <div class="camera-box">
             <video id="cameraVideo" autoplay playsinline muted></video>
-            <div class="camera-guide"></div>
+            <div class="camera-guide" id="cameraGuide"><div class="face-sensor" id="faceSensor"><i></i><span id="faceSensorText">BUSCANDO ROSTRO</span></div></div>
           </div>
           <div class="camera-controls">
             <button class="primary" onclick="startCamera()"><i data-lucide="camera"></i>Abrir cámara</button>
@@ -409,7 +410,7 @@ button,input,select,textarea{max-width:100%}
     </section>
 
     <section id="assistant" class="view">
-      <h1 class="page-title">Asistente FITFORGE</h1><p class="sub">Pregúntame sobre entrenamiento, nutrición, carrera, recuperación o uso de la app. Conecta un endpoint de IA en el servidor para respuestas generativas reales.</p>
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap"><div><h1 class="page-title">Asistente FITFORGE</h1><p class="sub">Pregúntame lo que quieras. Cuando la IA está configurada, puede buscar información actual y responder usando tu nombre y tus datos de FITFORGE.</p></div><span id="assistantStatus" class="badge">Comprobando IA…</span></div>
       <div class="assistant-wrap"><div class="assistant-topics"><button class="assistant-topic" onclick="askAssistantPreset('¿Cómo puedo empezar a correr si soy principiante?')">🏃 Empezar a correr</button><button class="assistant-topic" onclick="askAssistantPreset('Dame una rutina de fuerza para hoy de 30 minutos')">💪 Rutina de hoy</button><button class="assistant-topic" onclick="askAssistantPreset('¿Qué debo comer después de entrenar?')">🥗 Comer después</button><button class="assistant-topic" onclick="askAssistantPreset('¿Cómo mejorar mi sueño y recuperación?')">😴 Recuperación</button><button class="assistant-topic" onclick="askAssistantPreset('¿Cuándo debería parar un entrenamiento por dolor?')">🩹 Dolor</button></div><div class="chat"><div class="chat-messages" id="chatMessages"></div><div class="chat-input"><input id="chatInput" placeholder="Escribe tu pregunta…" onkeydown="if(event.key==='Enter')sendAssistant()"><button class="primary" onclick="sendAssistant()"><i data-lucide="send"></i>Enviar</button></div></div></div>
     </section>
 
@@ -490,7 +491,7 @@ const defaultState={
 let state=JSON.parse(localStorage.getItem('fitforge_state')||'null')||defaultState;
 let currentFilter='all',timer=null,seconds=0,currentWorkout=null;
 state.scan=state.scan||{before:null,after:null,beforeWeight:null,afterWeight:null,beforeFace:null,afterFace:null,lastFace:null};
-state.scan.beforeFace=state.scan.beforeFace||null;state.scan.afterFace=state.scan.afterFace||null;state.scan.lastFace=state.scan.lastFace||null; state.water=Number(state.water)||0; state.waterGoal=Number(state.waterGoal)||2500; state.foodGoal=Number(state.foodGoal)||2000; state.foods=Array.isArray(state.foods)?state.foods:[]; state.targetWeight=Number(state.targetWeight)||60; state.targetSessions=Number(state.targetSessions)||5; state.measurements=Array.isArray(state.measurements)?state.measurements:[];state.recipeFavs=Array.isArray(state.recipeFavs)?state.recipeFavs:[];
+state.scan.beforeFace=state.scan.beforeFace||null;state.scan.afterFace=state.scan.afterFace||null;state.scan.lastFace=state.scan.lastFace||null; state.scan.beforeShape=state.scan.beforeShape||null; state.scan.afterShape=state.scan.afterShape||null; state.water=Number(state.water)||0; state.waterGoal=Number(state.waterGoal)||2500; state.foodGoal=Number(state.foodGoal)||2000; state.foods=Array.isArray(state.foods)?state.foods:[]; state.targetWeight=Number(state.targetWeight)||60; state.targetSessions=Number(state.targetSessions)||5; state.measurements=Array.isArray(state.measurements)?state.measurements:[];state.recipeFavs=Array.isArray(state.recipeFavs)?state.recipeFavs:[];
 let gymMap=null,gymLayer=null,cameraStream=null;
 
 const recipes=[
@@ -504,15 +505,16 @@ const recipes=[
  {id:'smoothie',cat:'snack',title:'Batido de banano y avena',time:5,kcal:300,tag:'Post-entreno',img:'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=900&q=85',ingredients:['1 banano','½ taza de yogur','2 cucharadas de avena','Agua o leche'],steps:'Licúa todos los ingredientes hasta obtener una mezcla homogénea.'}
 ];
 let currentRecipeFilter='all';
-let faceMesh=null,faceBusy=false;
-let cloudSaveTimer=null;function save(){localStorage.setItem('fitforge_state',JSON.stringify(state));if(typeof supa!=='undefined'&&supa&&window.FF_USER){clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(syncStateCloud,700)}}
+let faceMesh=null,faceBusy=false,faceScanInterval=null;
+let cloudSaveTimer=null;function save(){localStorage.setItem('fitforge_state',JSON.stringify(state));if(typeof supa!=='undefined'&&supa&&window.FF_USER){clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(syncStateCloud,700)}else if(ffSessionUser){clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(syncLocalServerState,700)}}
 async function syncStateCloud(){if(!supa||!window.FF_USER)return;try{await supa.from('user_state').upsert({user_id:window.FF_USER.id,state_json:state,updated_at:new Date().toISOString()},{onConflict:'user_id'})}catch(e){console.warn('Cloud sync:',e)}}
+async function syncLocalServerState(){if(!ffSessionUser)return;try{await fetch(FF.stateEndpoint||'/api/me/state',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({state})})}catch(e){console.warn('Servidor FITFORGE:',e)}}
 function money(n){return Math.round(n).toLocaleString('es-NI')}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2200)}
 function showView(id){
  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
- window.scrollTo({top:0,behavior:'smooth'});
+ window.scrollTo({top:0,behavior:'smooth'}); if(id!=='scan')stopAutoFaceScan();
  if(id==='workouts')renderWorkouts(); if(id==='progress')renderProgress(); if(id==='notifications')renderNotifications(); if(id==='gyms')initGymMap(); if(id==='scan')renderScan(); if(id==='recipes')renderRecipes(); if(id==='nutrition')renderNutrition(); if(id==='water')renderWater(); if(id==='goals')renderGoals(); if(id==='run'){initRunMap();renderRunHistory();setTimeout(()=>runMap?.invalidateSize(),100)} if(id==='foodscan'){stopFoodCamera();document.getElementById('notificationPermission')?.removeAttribute('data-x')} if(id==='calendar')renderCalendar(); if(id==='assistant')renderChat(); if(id==='health')renderWellness();
 }
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
@@ -532,56 +534,22 @@ function initGymMap(){
   gymMap=L.map(el,{zoomControl:true}).setView([13.0919,-86.3538],13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(gymMap);
 }
-async function findGyms(){
-  initGymMap();
-  const status=document.getElementById('locationStatus');
-  const list=document.getElementById('gymList');
-  status.textContent='Solicitando ubicación…';
-  list.innerHTML='<div class="empty"><i data-lucide="loader-circle"></i><p>Buscando gimnasios cercanos…</p></div>';
-  lucide.createIcons();
-  if(!navigator.geolocation){
-    status.textContent='Este navegador no permite geolocalización.';
-    list.innerHTML='<div class="empty"><p>Activa la geolocalización del navegador para usar esta función.</p></div>'; return;
-  }
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    const lat=pos.coords.latitude,lon=pos.coords.longitude;
-    const accuracy=Math.round(pos.coords.accuracy||0);
-    status.textContent=`Ubicación obtenida · precisión aprox. ${accuracy} m`;
-    gymMap.setView([lat,lon],14);
-    if(gymLayer)gymLayer.clearLayers();
-    gymLayer=L.layerGroup().addTo(gymMap);
-    L.marker([lat,lon]).addTo(gymLayer).bindPopup('<b>Tu ubicación</b>').openPopup();
-    const radius=Number(document.getElementById('gymRadius')?.value)||10000; const query=`[out:json][timeout:25];(nwr["leisure"="fitness_centre"](around:${radius},${lat},${lon});nwr["sport"="fitness"](around:${radius},${lat},${lon});nwr["leisure"="sports_centre"](around:${radius},${lat},${lon});nwr["amenity"="gym"](around:${radius},${lat},${lon}););out center tags;`;
-    try{
-      const r=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',headers:{'Content-Type':'text/plain'},body:query});
-      if(!r.ok)throw new Error('Overpass');
-      const data=await r.json();
-      const gyms=(data.elements||[]).map(x=>{
-        const g=x.center||x; const t=x.tags||{};
-        return {id:x.id,name:t.name||'Gimnasio sin nombre',lat:g.lat,lon:g.lon,address:t['addr:street']||t['addr:full']||'',phone:t.phone||'',website:t.website||'',dist:haversine(lat,lon,g.lat,g.lon)};
-      }).filter(x=>x.lat&&x.lon).sort((a,b)=>a.dist-b.dist).filter((x,i,a)=>i===a.findIndex(y=>y.name.toLowerCase()===x.name.toLowerCase()&&Math.abs(y.lat-x.lat)<0.001&&Math.abs(y.lon-x.lon)<0.001));
-      document.getElementById('gymCount').textContent=`${gyms.length} gimnasios encontrados`; if(!gyms.length){
-        list.innerHTML='<div class="empty"><i data-lucide="search-x"></i><p>No encontramos gimnasios registrados cerca de tu ubicación.</p></div>';
-      }else{
-        gyms.forEach(g=>L.marker([g.lat,g.lon]).addTo(gymLayer).bindPopup(`<b>${escapeHTML(g.name)}</b><br>${(g.dist/1000).toFixed(1)} km`));
-        list.innerHTML=gyms.map(g=>`<article class="gym-item">
-          <div class="gym-main"><div class="gym-icon"><i data-lucide="dumbbell"></i></div><div><h3>${escapeHTML(g.name)}</h3><p>${(g.dist/1000).toFixed(1)} km${g.address?' · '+escapeHTML(g.address):''}</p></div></div>
-          <div class="gym-actions"><button class="mini-btn" onclick="focusGym(${g.lat},${g.lon},'${escapeJS(g.name)}')"><i data-lucide="map"></i>Mapa</button>
-          <button class="mini-btn primary-mini" onclick="routeToGym(${g.lat},${g.lon})"><i data-lucide="navigation"></i>Ruta</button></div>
-        </article>`).join('');
-      }
-      lucide.createIcons();
-    }catch(e){
-      list.innerHTML='<div class="empty"><i data-lucide="wifi-off"></i><p>No se pudo consultar el mapa. Comprueba tu conexión e inténtalo de nuevo.</p></div>';
-      lucide.createIcons();
-    }
-  },err=>{
-    const msg=err.code===1?'Permiso de ubicación denegado. Actívalo en el navegador.':'No se pudo obtener tu ubicación.';
-    status.textContent=msg;
-    list.innerHTML=`<div class="empty"><i data-lucide="map-pin-off"></i><p>${msg}</p></div>`;
-    lucide.createIcons();
-  },{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+async function queryGymsAt(lat,lon,label='Tu ubicación'){
+  initGymMap();const status=document.getElementById('locationStatus'),list=document.getElementById('gymList');const radius=Number(document.getElementById('gymRadius')?.value)||10000;
+  status.textContent=`Buscando gimnasios en ${label}…`;gymMap.setView([lat,lon],14);if(gymLayer)gymLayer.clearLayers();gymLayer=L.layerGroup().addTo(gymMap);L.marker([lat,lon]).addTo(gymLayer).bindPopup(`<b>${escapeHTML(label)}</b>`).openPopup();
+  try{
+    const endpoint=FF.gymsEndpoint||'/api/gyms';const url=endpoint.includes('?')?`${endpoint}&lat=${lat}&lon=${lon}&radius=${radius}`:`${endpoint}?lat=${lat}&lon=${lon}&radius=${radius}`;const r=await fetch(url);if(!r.ok)throw new Error('gyms');const data=await r.json();
+    const gyms=(data.elements||[]).map(x=>{const g=x.center||x,t=x.tags||{};return{id:x.id,name:t.name||'Gimnasio sin nombre',lat:g.lat,lon:g.lon,address:t['addr:street']||t['addr:full']||'',phone:t.phone||'',website:t.website||'',dist:haversine(lat,lon,g.lat,g.lon)}}).filter(x=>x.lat&&x.lon).sort((a,b)=>a.dist-b.dist).filter((x,i,a)=>i===a.findIndex(y=>y.name.toLowerCase()===x.name.toLowerCase()&&Math.abs(y.lat-x.lat)<.001&&Math.abs(y.lon-x.lon)<.001));
+    document.getElementById('gymCount').textContent=`${gyms.length} lugares deportivos encontrados`;if(!gyms.length){list.innerHTML='<div class="empty"><i data-lucide="search-x"></i><p>No hay gimnasios publicados en OpenStreetMap dentro del radio seleccionado.</p></div>'}else{gyms.forEach(g=>L.marker([g.lat,g.lon]).addTo(gymLayer).bindPopup(`<b>${escapeHTML(g.name)}</b><br>${(g.dist/1000).toFixed(1)} km`));list.innerHTML=gyms.map(g=>`<article class="gym-item"><div class="gym-main"><div class="gym-icon"><i data-lucide="dumbbell"></i></div><div><h3>${escapeHTML(g.name)}</h3><p>${(g.dist/1000).toFixed(1)} km${g.address?' · '+escapeHTML(g.address):''}</p></div></div><div class="gym-actions"><button class="mini-btn" onclick="focusGym(${g.lat},${g.lon},'${escapeJS(g.name)}')"><i data-lucide="map"></i>Mapa</button><button class="mini-btn primary-mini" onclick="routeToGym(${g.lat},${g.lon})"><i data-lucide="navigation"></i>Ruta</button></div></article>`).join('')}
+    status.textContent=`${label} · datos en vivo de OpenStreetMap`;lucide.createIcons();
+  }catch(e){list.innerHTML='<div class="empty"><i data-lucide="wifi-off"></i><p>No se pudo consultar el mapa. Inténtalo de nuevo.</p></div>';status.textContent='No se pudo actualizar la lista';lucide.createIcons()}
 }
+async function findGyms(){
+  if(!navigator.geolocation){toast('Este navegador no permite geolocalización');return}
+  const status=document.getElementById('locationStatus');status.textContent='Solicitando ubicación…';
+  navigator.geolocation.getCurrentPosition(pos=>queryGymsAt(pos.coords.latitude,pos.coords.longitude,`Tu ubicación · ±${Math.round(pos.coords.accuracy||0)} m`),err=>{status.textContent=err.code===1?'Permiso de ubicación denegado':'No se pudo obtener la ubicación';toast('Usa “Somoto, Madriz” para ver la zona sin compartir ubicación')},{enableHighAccuracy:true,timeout:15000,maximumAge:30000});
+}
+function findSomotoGyms(){queryGymsAt(13.4837,-86.5826,'Somoto, Madriz')}
 function haversine(a,b,c,d){const R=6371000,rad=Math.PI/180;const x=(c-a)*rad,y=(d-b)*rad;const q=Math.sin(x/2)**2+Math.cos(a*rad)*Math.cos(c*rad)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(q))}
 function escapeHTML(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function escapeJS(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
@@ -590,22 +558,19 @@ function routeToGym(lat,lon){window.open(`https://www.google.com/maps/dir/?api=1
 
 async function startCamera(){
   try{
+    if(!navigator.mediaDevices?.getUserMedia)throw new Error('camera');
     if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());
-    cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}},audio:false});
-    document.getElementById('cameraVideo').srcObject=cameraStream;
-    toast('✓ Cámara activada');
-  }catch(e){toast('No se pudo abrir la cámara. Revisa el permiso del navegador.')}
+    cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'user'},width:{ideal:1280},height:{ideal:720}},audio:false});
+    const video=document.getElementById('cameraVideo');video.srcObject=cameraStream;await video.play().catch(()=>{});initFaceMesh();startAutoFaceScan();toast('✓ Sensor facial activo');
+  }catch(e){toast('No se pudo abrir la cámara. Usa HTTPS o localhost y permite la cámara.')}
 }
 async function captureScan(type){
   const video=document.getElementById('cameraVideo');
   if(!video.srcObject || video.readyState<2){toast('Primero abre la cámara');return}
-  initFaceMesh();
-  if(faceMesh){try{faceBusy=true;await faceMesh.send({image:video});}catch(e){faceBusy=false}}
-  const canvas=document.getElementById('scanCanvas');
-  canvas.width=video.videoWidth||640;canvas.height=video.videoHeight||480;
-  canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
-  state.scan[type]=canvas.toDataURL('image/jpeg',.86);
-  if(state.scan.lastFace)state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));
+  const ok=await analyzeLiveFace();
+  if(!ok||!state.scan.lastFace){toast('Coloca tu rostro dentro del sensor y vuelve a intentarlo');return}
+  const canvas=document.getElementById('scanCanvas');canvas.width=video.videoWidth||640;canvas.height=video.videoHeight||480;canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+  state.scan[type]=canvas.toDataURL('image/jpeg',.86);state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));state.scan[type+'Shape']=JSON.parse(JSON.stringify(state.scan.lastFace.shape));
   save();renderScan();toast(type==='before'?'✓ Escaneo inicial guardado':'✓ Escaneo actual guardado');
 }
 function saveScanWeight(){
@@ -628,7 +593,7 @@ function renderScan(){
 }
 function clearScan(){
   if(!confirm('¿Borrar las fotos y mediciones de progreso?'))return;
-  state.scan={before:null,after:null,beforeWeight:null,afterWeight:null,beforeFace:null,afterFace:null,lastFace:null};save();renderScan();toast('Progreso visual borrado');
+  state.scan={before:null,after:null,beforeWeight:null,afterWeight:null,beforeFace:null,afterFace:null,lastFace:null,beforeShape:null,afterShape:null};save();renderScan();toast('Progreso visual borrado');
 }
 
 function renderRecipes(){
@@ -644,23 +609,33 @@ document.querySelectorAll('[data-rfilter]').forEach(b=>b.addEventListener('click
 function initFaceMesh(){
  if(faceMesh||typeof FaceMesh==='undefined')return;
  faceMesh=new FaceMesh({locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
- faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.55,minTrackingConfidence:.55});
+ faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.45,minTrackingConfidence:.45});
  faceMesh.onResults(res=>{faceBusy=false;const lm=res.multiFaceLandmarks?.[0];if(!lm){setFaceUI(null);return} const m=faceMetrics(lm);state.scan.lastFace=m;setFaceUI(m);});
 }
 function faceMetrics(l){
  const xs=l.map(p=>p.x),ys=l.map(p=>p.y);const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const w=maxX-minX,h=maxY-minY;
- const nose=l[1],leftEye=l[33],rightEye=l[263],leftEar=l[234],rightEar=l[454],upperLip=l[13],lowerLip=l[14];
- const eyeY=(leftEye.y+rightEye.y)/2, eyeX=(leftEye.x+rightEye.x)/2; const tilt=Math.atan2(rightEye.y-leftEye.y,rightEye.x-leftEye.x)*180/Math.PI;
- const yaw=(nose.x-eyeX)/Math.max((rightEye.x-leftEye.x),.001); const mouthGap=Math.abs(lowerLip.y-upperLip.y); const centered=Math.abs((minX+maxX)/2-.5);
- const framing=w>.28&&w<.72&&h>.35&&h<.9&&centered<.18; const quality=framing&&Math.abs(tilt)<12?'Buena':framing?'Aceptable':'Repite la captura';
- let orientation='Frente'; if(yaw>.16)orientation='Ligeramente a la izquierda'; if(yaw<-.16)orientation='Ligeramente a la derecha';
- return {width:w,height:h,tilt,yaw,mouthGap,centered,framing,quality,orientation,eyeLine:eyeY,ts:new Date().toISOString()};
+ const nose=l[1],leftEye=l[33],rightEye=l[263],upperLip=l[13],lowerLip=l[14];
+ const eyeX=(leftEye.x+rightEye.x)/2; const tilt=Math.atan2(rightEye.y-leftEye.y,rightEye.x-leftEye.x)*180/Math.PI;
+ const eyeDist=Math.max(Math.hypot(rightEye.x-leftEye.x,rightEye.y-leftEye.y),.001); const yaw=(nose.x-eyeX)/eyeDist; const mouthGap=Math.abs(lowerLip.y-upperLip.y); const centered=Math.abs((minX+maxX)/2-.5);
+ const sizeScore=Math.max(0,100-Math.abs(w-.46)*180-Math.abs(h-.62)*80); const centerScore=Math.max(0,100-centered*260); const tiltScore=Math.max(0,100-Math.abs(tilt)*4); const poseScore=Math.max(0,100-Math.min(100,Math.abs(yaw)*260));
+ const score=Math.round(Math.max(0,Math.min(100,sizeScore*.35+centerScore*.25+tiltScore*.2+poseScore*.2)));
+ const framing=w>.13&&w<.9&&h>.2&&h<.98&&centered<.30; const quality=score>=78?'Buena':score>=58?'Aceptable':'Mejorar';
+ let orientation='Frente'; if(yaw>.16)orientation='Gira un poco a la derecha'; if(yaw<-.16)orientation='Gira un poco a la izquierda';
+ return {width:w,height:h,tilt,yaw,mouthGap,centered,framing,quality,score,orientation,eyeDist,shape:{faceRatio:Number((w/Math.max(h,.001)).toFixed(4)),eyeRatio:Number((eyeDist/Math.max(w,.001)).toFixed(4)),mouthRatio:Number((mouthGap/Math.max(h,.001)).toFixed(4))},ts:new Date().toISOString()};
 }
-function setFaceUI(m){const dot=document.getElementById('faceDot'),status=document.getElementById('faceStatus');if(!dot||!status)return;if(!m){dot.classList.remove('ok');status.textContent='No se detectó un rostro';['faceDetected','faceFraming','faceOrientation','faceQuality'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=id==='faceDetected'?'No':'—'});const v=document.getElementById('scanVerdict');if(v)v.innerHTML='<b>Resultado</b><p style="margin:6px 0 0">No hay un rostro detectable. Coloca la cara dentro de la guía y usa buena iluminación.</p>';return}dot.classList.add('ok');status.textContent='Rostro detectado correctamente';document.getElementById('faceDetected').textContent='Sí';document.getElementById('faceFraming').textContent=m.framing?'Correcto':'Ajustar';document.getElementById('faceOrientation').textContent=m.orientation;document.getElementById('faceQuality').textContent=m.quality;const v=document.getElementById('scanVerdict');if(v){const ready=m.framing&&m.quality==='Buena';let extra='';const h=Number(state.height),w=Number(state.weight);if(h>0&&w>0){const bmi=w/((h/100)**2);extra=` Indicador IMC registrado: ${bmi.toFixed(1)} (solo orientativo; no es un diagnóstico).`}v.innerHTML=`<b>${ready?'✓ Captura apta para comparar':'⚠ Ajusta la captura'}</b><p style="margin:6px 0 0">${ready?'El rostro está suficientemente centrado para guardar una foto de progreso. Esto no significa que la app pueda determinar si estás saludable solo por tu cara.':'Mira de frente, acerca o aleja el teléfono y busca iluminación uniforme.'}${extra}</p>`}}
-async function analyzeLiveFace(){
- initFaceMesh(); if(!faceMesh){toast('No se pudo cargar el escáner facial. Comprueba tu conexión.');return}
- const video=document.getElementById('cameraVideo');if(!video.srcObject||video.readyState<2){toast('Primero abre la cámara');return} if(faceBusy)return;faceBusy=true;try{await faceMesh.send({image:video});toast(state.scan.lastFace?'✓ Rostro analizado':'No se detectó un rostro')}catch(e){faceBusy=false;toast('No se pudo analizar la cámara')}}
-function captureFaceAnalysis(type){return analyzeLiveFace().then(()=>{if(state.scan.lastFace){state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));save();}})}
+function faceComparison(){const a=state.scan.beforeFace?.shape,b=state.scan.afterFace?.shape;if(!a||!b)return null;const d=(Math.abs(a.faceRatio-b.faceRatio)/Math.max(a.faceRatio,.001)+Math.abs(a.eyeRatio-b.eyeRatio)/Math.max(a.eyeRatio,.001)+Math.abs(a.mouthRatio-b.mouthRatio)/Math.max(a.mouthRatio,.001))/3;return Math.round(Math.min(100,d*100));}
+function setFaceUI(m){
+ const dot=document.getElementById('faceDot'),status=document.getElementById('faceStatus'),guide=document.getElementById('cameraGuide'),sensor=document.getElementById('faceSensor'),sensorText=document.getElementById('faceSensorText');if(!dot||!status)return;
+ if(!m){dot.classList.remove('ok');status.textContent='Buscando rostro…';guide?.classList.add('scanning');guide?.classList.remove('detected');if(sensorText)sensorText.textContent='BUSCANDO ROSTRO';['faceDetected','faceFraming','faceOrientation','faceQuality'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=id==='faceDetected'?'No':'—'});const v=document.getElementById('scanVerdict');if(v)v.innerHTML='<b>Escáner activo</b><p style="margin:6px 0 0">Mira a la cámara. El sensor analiza automáticamente el rostro; no necesitas adivinar la distancia.</p>';return}
+ dot.classList.add('ok');status.textContent='Rostro detectado · sensor activo';guide?.classList.remove('scanning');guide?.classList.add('detected');if(sensorText)sensorText.textContent=`ROSTRO DETECTADO · ${m.score}%`;
+ document.getElementById('faceDetected').textContent='Sí';document.getElementById('faceFraming').textContent=m.framing?'Correcto':'Ajustar';document.getElementById('faceOrientation').textContent=m.orientation;document.getElementById('faceQuality').textContent=`${m.quality} · ${m.score}/100`;
+ const v=document.getElementById('scanVerdict');if(v){let comparison=faceComparison();let cmp=comparison!==null?`<br><b>Comparación geométrica:</b> ${comparison<5?'muy estable':comparison<12?'cambio leve':'cambio visible'} (${comparison}% de variación relativa entre rasgos normalizados).`:'';v.innerHTML=`<b>Resultado del escaneo: ${m.score}/100</b><p style="margin:6px 0 0">Rostro detectado, encuadre ${m.framing?'válido':'mejorable'} y orientación ${escapeHTML(m.orientation.toLowerCase())}. Este resultado mide la calidad de la captura y rasgos geométricos visibles; no diagnostica salud ni calcula grasa corporal.</p>${cmp}`}}
+async function startAutoFaceScan(){if(faceScanInterval)clearInterval(faceScanInterval);faceScanInterval=setInterval(()=>{if(document.getElementById('cameraVideo')?.srcObject&&!faceBusy)analyzeLiveFace(true)},700)}
+function stopAutoFaceScan(){if(faceScanInterval)clearInterval(faceScanInterval);faceScanInterval=null}
+async function analyzeLiveFace(silent=false){
+ initFaceMesh(); if(!faceMesh){if(!silent)toast('No se pudo cargar el sensor facial. Comprueba tu conexión.');return false}
+ const video=document.getElementById('cameraVideo');if(!video.srcObject||video.readyState<2){if(!silent)toast('Primero abre la cámara');return false} if(faceBusy)return !!state.scan.lastFace;faceBusy=true;try{state.scan.lastFace=null;await faceMesh.send({image:video});const ok=!!state.scan.lastFace;if(!silent)toast(ok?'✓ Rostro escaneado':'No se detectó un rostro');return ok}catch(e){faceBusy=false;if(!silent)toast('No se pudo analizar la cámara');return false}}
+function captureFaceAnalysis(type){return analyzeLiveFace().then(ok=>{if(ok&&state.scan.lastFace){state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));save();}})}
 function todayKey(){return new Date().toISOString().slice(0,10)}
 function addWater(ml){state.water+=ml;save();renderWater();renderStats();toast(`+${ml} ml de agua`)}
 function renderWater(){const v=state.water||0,g=state.waterGoal||2500,p=Math.min(100,Math.round(v/g*100)); const a=document.getElementById('waterValue'),b=document.getElementById('waterGoal'),bar=document.getElementById('waterBar'),txt=document.getElementById('waterText'); if(a)a.textContent=v;if(b)b.textContent=g;if(bar)bar.style.width=p+'%';if(txt)txt.textContent=`${v} de ${g} ml · ${p}%`; const hv=document.getElementById('homeWater'),hb=document.getElementById('homeWaterBar');if(hv)hv.textContent=v;if(hb)hb.style.width=p+'%'}
@@ -734,11 +709,11 @@ function finishWorkout(){
  closeModal();toast(`✓ ${currentWorkout.title} completado`);
 }
 function saveProfile(){
- state.name=document.getElementById('nameInput').value.trim()||'Monica Spencer';state.email=document.getElementById('emailInput').value.trim()||'monica@example.com';state.weight=Number(document.getElementById('weightInput').value)||63;state.height=Number(document.getElementById('heightInput')?.value)||state.height||170;state.sleepHours=Number(document.getElementById('sleepInput')?.value)||state.sleepHours||8;state.goal=document.getElementById('goalInput').value;save();renderStats();renderWellness();toast('✓ Perfil actualizado');if(supa&&window.FF_USER)supa.from('profiles').upsert({id:window.FF_USER.id,name:state.name,weight:state.weight,height:state.height,goal:state.goal},{onConflict:'id'});
+ state.name=document.getElementById('nameInput').value.trim()||'Usuario FITFORGE';state.email=document.getElementById('emailInput').value.trim()||state.email||'';state.weight=Number(document.getElementById('weightInput').value)||0;state.height=Number(document.getElementById('heightInput')?.value)||0;state.sleepHours=Number(document.getElementById('sleepInput')?.value)||0;state.goal=document.getElementById('goalInput').value;save();renderStats();renderWellness();renderProfile();toast('✓ Perfil actualizado');if(supa&&window.FF_USER)supa.from('profiles').upsert({id:window.FF_USER.id,name:state.name,weight:state.weight,height:state.height,goal:state.goal},{onConflict:'id'});else if(ffSessionUser)fetch(FF.profileEndpoint||'/api/me/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:state.name,avatar:state.avatar||''})}).catch(()=>{});
 }
 
 /* ===== FITFORGE 2.0 runtime ===== */
-const FF=(window.FITFORGE_CONFIG||{}); let supa=null, currentAuthMode='login', deferredInstall=null;
+const FF=(window.FITFORGE_CONFIG||{}); let supa=null, currentAuthMode='login', deferredInstall=null, ffSessionUser=null;
 if(FF.supabaseUrl&&FF.supabaseAnonKey&&window.supabase?.createClient){supa=window.supabase.createClient(FF.supabaseUrl,FF.supabaseAnonKey)}
 state.avatar=state.avatar||'';state.runs=Array.isArray(state.runs)?state.runs:[];state.chat=Array.isArray(state.chat)?state.chat:[];state.lastFoodScan=state.lastFoodScan||null;
 let runMap=null,runLayer=null,runWatch=null,runTimer=null,runStartAt=0,runElapsed=0,runPoints=[],runDistanceM=0,runPaused=false,runCameraStream=null,foodCameraStream=null,barcodeDetector=null;
@@ -765,16 +740,25 @@ const dailyTips=[
  ['Paciencia','Los cambios de composición corporal y rendimiento requieren tiempo y constancia.'],
  ['Seguridad','Si tienes una enfermedad, lesión o tomas medicamentos, consulta a un profesional antes de cambiar mucho tu actividad.']
 ];
-function configReady(){return !!supa}
+function configReady(){return !!supa || !!FF.authEndpoint}
 function setAuthMode(mode){currentAuthMode=mode;document.getElementById('loginTab').classList.toggle('active',mode==='login');document.getElementById('registerTab').classList.toggle('active',mode==='register');document.getElementById('authNameWrap').style.display=mode==='register'?'block':'none';document.getElementById('authSubmit').textContent=mode==='register'?'Crear cuenta':'Iniciar sesión';document.getElementById('authStatus').textContent=''}
-async function initAuth(){if(supa){const {data}=await supa.auth.getSession();if(data.session){window.FF_USER=data.session.user;hideAuth();await loadCloudProfile(data.session.user)}else document.getElementById('authScreen').classList.remove('hidden');supa.auth.onAuthStateChange((_e,session)=>{if(session){window.FF_USER=session.user;hideAuth();loadCloudProfile(session.user)}else document.getElementById('authScreen').classList.remove('hidden')})}else{document.getElementById('authScreen').classList.add('hidden')}}
-function hideAuth(){document.getElementById('authScreen').classList.add('hidden');welcomeNotification()}
-async function submitAuth(){const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value,name=document.getElementById('authName').value.trim();if(!email||password.length<6){document.getElementById('authStatus').textContent='Introduce un correo válido y una contraseña de al menos 6 caracteres.';return}if(!supa){toast('Configura Supabase para cuentas reales');continueGuest();return}document.getElementById('authStatus').textContent='Conectando…';try{let r;if(currentAuthMode==='register')r=await supa.auth.signUp({email,password,options:{data:{name:name||'Usuario FITFORGE'}}});else r=await supa.auth.signInWithPassword({email,password});if(r.error)throw r.error;if(currentAuthMode==='register'&&!r.data.session){document.getElementById('authStatus').textContent='Cuenta creada. Revisa tu correo si la confirmación está activada.'}else hideAuth()}catch(e){document.getElementById('authStatus').textContent=e.message||'No se pudo iniciar sesión.'}}
-function continueGuest(){window.FF_GUEST=true;hideAuth();toast('Modo invitado activo: datos solo en este dispositivo')}
-async function logout(){if(supa)await supa.auth.signOut();window.FF_USER=null;location.reload()}
-async function loadCloudProfile(user){try{const {data:cloud}=await supa.from('user_state').select('state_json').eq('user_id',user.id).maybeSingle();if(cloud?.state_json){state=Object.assign(state,cloud.state_json);localStorage.setItem('fitforge_state',JSON.stringify(state))}const {data}=await supa.from('profiles').select('*').eq('id',user.id).maybeSingle();if(data){Object.assign(state,{name:data.name||state.name,email:user.email||state.email,weight:Number(data.weight)||state.weight,goal:data.goal||state.goal,avatar:data.avatar_url||state.avatar});localStorage.setItem('fitforge_state',JSON.stringify(state))}renderStats();renderProgress();renderScan();renderNutrition();renderRunHistory();renderNotifications()}catch(e){console.warn(e)}}
-async function changeAvatar(ev){const file=ev.target.files?.[0];if(!file)return;if(file.size>4*1024*1024){toast('La foto debe pesar menos de 4 MB');return}const reader=new FileReader();reader.onload=async()=>{state.avatar=reader.result;save();renderStats();toast('✓ Foto de perfil actualizada');if(supa&&window.FF_USER){try{const path=`${window.FF_USER.id}/avatar-${Date.now()}.${file.name.split('.').pop()||'jpg'}`;const {error}=await supa.storage.from('avatars').upload(path,file,{upsert:true});if(!error){const {data}=supa.storage.from('avatars').getPublicUrl(path);state.avatar=data.publicUrl;save();renderStats();await supa.from('profiles').upsert({id:window.FF_USER.id,name:state.name,avatar_url:data.publicUrl},{onConflict:'id'})}}catch(e){console.warn(e)}}};reader.readAsDataURL(file)}
-function welcomeNotification(){const day=new Date().toLocaleDateString('es-NI',{weekday:'long',day:'numeric',month:'long'});const key='ff_welcome_'+todayKey();if(localStorage.getItem(key))return;state.notifications.unshift({text:`¡Bienvenido a FITFORGE! Hoy es ${day}. Revisa tu consejo del día y tu plan.`,time:'Ahora',icon:'sparkles'});state.notifications=state.notifications.slice(0,10);save();localStorage.setItem(key,'1');renderNotifications()}
+async function initAuth(){
+  if(supa){const {data}=await supa.auth.getSession();if(data.session){window.FF_USER=data.session.user;hideAuth();await loadCloudProfile(data.session.user)}else document.getElementById('authScreen').classList.remove('hidden');supa.auth.onAuthStateChange((_e,session)=>{if(session){window.FF_USER=session.user;hideAuth();loadCloudProfile(session.user)}else document.getElementById('authScreen').classList.remove('hidden')});return}
+  try{const r=await fetch(FF.authEndpoint+'/me');const d=await r.json();if(d.user){ffSessionUser=d.user;window.FF_USER=d.user;hideAuth();await loadLocalServerProfile()}else document.getElementById('authScreen').classList.remove('hidden')}catch(e){document.getElementById('authScreen').classList.remove('hidden');document.getElementById('authStatus').textContent='Servidor no disponible. Puedes usar modo invitado.'}
+}
+function hideAuth(){document.getElementById('authScreen').classList.add('hidden');welcomeNotification();renderStats();renderProfile?.();}
+async function submitAuth(){
+ const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value,name=document.getElementById('authName').value.trim();
+ if(!email||password.length<8){document.getElementById('authStatus').textContent='Introduce un correo válido y una contraseña de al menos 8 caracteres.';return}
+ if(supa){document.getElementById('authStatus').textContent='Conectando…';try{let r;if(currentAuthMode==='register')r=await supa.auth.signUp({email,password,options:{data:{name:name||'Usuario FITFORGE'}}});else r=await supa.auth.signInWithPassword({email,password});if(r.error)throw r.error;if(currentAuthMode==='register'&&!r.data.session){document.getElementById('authStatus').textContent='Cuenta creada. Revisa tu correo si la confirmación está activada.'}else hideAuth()}catch(e){document.getElementById('authStatus').textContent=e.message||'No se pudo iniciar sesión.'}return}
+ document.getElementById('authStatus').textContent='Conectando…';
+ try{const endpoint=currentAuthMode==='register'?'/register':'/login';const r=await fetch(FF.authEndpoint+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password,name})});const d=await r.json();if(!r.ok)throw new Error(d.error||'No se pudo autenticar');ffSessionUser=d.user;window.FF_USER=d.user;state.name=d.user.name||state.name;state.email=d.user.email||state.email;save();hideAuth();await loadLocalServerProfile();toast(currentAuthMode==='register'?'✓ Cuenta creada':'✓ Sesión iniciada')}catch(e){document.getElementById('authStatus').textContent=e.message||'No se pudo iniciar sesión.'}
+}
+function continueGuest(){window.FF_GUEST=true;ffSessionUser=null;hideAuth();toast('Modo invitado activo: datos solo en este dispositivo')}
+async function logout(){try{if(supa)await supa.auth.signOut();else await fetch((FF.authEndpoint||'/api/auth')+'/logout',{method:'POST'})}catch{}window.FF_USER=null;ffSessionUser=null;location.reload()}
+async function loadCloudProfile(user){try{const {data:cloud}=await supa.from('user_state').select('state_json').eq('user_id',user.id).maybeSingle();if(cloud?.state_json){state=Object.assign(state,cloud.state_json);localStorage.setItem('fitforge_state',JSON.stringify(state))}const {data}=await supa.from('profiles').select('*').eq('id',user.id).maybeSingle();if(data){Object.assign(state,{name:data.name||state.name,email:user.email||state.email,weight:Number(data.weight)||state.weight,goal:data.goal||state.goal,avatar:data.avatar_url||state.avatar});localStorage.setItem('fitforge_state',JSON.stringify(state))}renderStats();renderProgress();renderScan();renderNutrition();renderRunHistory();renderNotifications();renderProfile?.()}catch(e){console.warn(e)}}
+async function loadLocalServerProfile(){try{const r=await fetch(FF.stateEndpoint||'/api/me/state');if(!r.ok)return;const d=await r.json();if(d.state&&typeof d.state==='object'){state=Object.assign(JSON.parse(JSON.stringify(defaultState)),d.state);state.scan=state.scan||{before:null,after:null,beforeWeight:null,afterWeight:null,beforeFace:null,afterFace:null,lastFace:null,beforeShape:null,afterShape:null};state.runs=Array.isArray(state.runs)?state.runs:[];state.chat=Array.isArray(state.chat)?state.chat:[];state.foods=Array.isArray(state.foods)?state.foods:[];localStorage.setItem('fitforge_state',JSON.stringify(state))}renderStats();renderProgress();renderScan();renderNutrition();renderRunHistory();renderNotifications();renderProfile?.();renderChat()}catch(e){console.warn('Carga de cuenta:',e)}}
+async function changeAvatar(ev){const file=ev.target.files?.[0];if(!file)return;if(file.size>3*1024*1024){toast('La foto debe pesar menos de 3 MB');return}const reader=new FileReader();reader.onload=async()=>{state.avatar=reader.result;save();renderStats();renderProfile?.();toast('✓ Foto de perfil actualizada');if(supa&&window.FF_USER){try{const path=`${window.FF_USER.id}/avatar-${Date.now()}.${file.name.split('.').pop()||'jpg'}`;const {error}=await supa.storage.from('avatars').upload(path,file,{upsert:true});if(!error){const {data}=supa.storage.from('avatars').getPublicUrl(path);state.avatar=data.publicUrl;save();renderStats();await supa.from('profiles').upsert({id:window.FF_USER.id,name:state.name,avatar_url:data.publicUrl},{onConflict:'id'})}}catch(e){console.warn(e)}}else if(ffSessionUser){try{await fetch(FF.profileEndpoint||'/api/me/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:state.name,avatar:state.avatar})})}catch(e){console.warn(e)}}};reader.readAsDataURL(file)}
 async function requestAppNotifications(){if(!('Notification' in window)){toast('Este navegador no admite notificaciones web');return}if(!window.isSecureContext){toast('Las notificaciones requieren HTTPS o localhost');return}try{const p=await Notification.requestPermission();const el=document.getElementById('notificationPermission');if(el)el.textContent=p==='granted'?'✓ Notificaciones activadas':p==='denied'?'Notificaciones bloqueadas en el navegador':'No se concedió permiso';if(p==='granted'){if(navigator.serviceWorker?.ready){const reg=await navigator.serviceWorker.ready;reg.showNotification('FITFORGE',{body:'¡Listo! Recibirás avisos de tu actividad cuando la plataforma los envíe.',icon:'icon-192.svg',badge:'icon-192.svg'}).catch(()=>{})}toast('✓ Notificaciones activadas')}}catch(e){toast('No se pudo activar las notificaciones')}}
 function renderNotificationPermission(){const el=document.getElementById('notificationPermission');if(el&&'Notification' in window)el.textContent=Notification.permission==='granted'?'✓ Permiso concedido':Notification.permission==='denied'?'Bloqueadas en este navegador':'Pendientes de permiso'}
 function updateInstall(){const b=document.getElementById('installBanner');if(!b)return;if(deferredInstall)b.classList.add('show');else if(window.matchMedia('(display-mode: standalone)').matches)b.classList.remove('show')}
@@ -838,7 +822,7 @@ async function sendAssistant(){
      console.warn('Asistente remoto:',e);
    }
  }
- addAssistantMessage('ai',localAssistant(q)+(canRemote?'\n\nSi quieres respuestas generativas completas, inicia el servidor FITFORGE y configura OPENAI_API_KEY en .env.':'\n\nEl modo local está activo. Para respuestas generativas completas, ejecuta el servidor incluido en la carpeta de FITFORGE.'));
+ addAssistantMessage('ai',localAssistant(q)+(canRemote?'':'\n\nEl modo local sigue activo. Para preguntas abiertas y datos actuales, configura OPENAI_API_KEY en el servidor.'));
 }
 function localAssistant(q){
  const x=q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -864,8 +848,12 @@ function localAssistant(q){
 function renderWellness(){const h=Number(state.height),w=Number(state.weight),sleep=Number(state.sleepHours||0),water=Number(state.water||0),mins=Number(state.minutes||0);let items=[];if(h>0&&w>0){const bmi=w/((h/100)**2);items.push(`IMC registrado: ${bmi.toFixed(1)}. El IMC es una medida de cribado, no un diagnóstico y no describe por sí solo tu salud.`)}else items.push('Añade altura y peso en Perfil para calcular un indicador de IMC.');items.push(`Actividad acumulada: ${mins} min registrados en FITFORGE.`);items.push(`Agua registrada hoy: ${water} ml.`);if(sleep)items.push(`Sueño registrado: ${sleep} h.`);document.getElementById('wellnessResult').innerHTML=`<ul style="padding-left:18px;font-size:12px;line-height:1.6;color:#666">${items.map(escapeHTML).map(x=>'<li>'+x+'</li>').join('')}</ul>`}
 function showPain(type){const advice={cabeza:'Si es leve, descansa, hidrátate y evita el ejercicio intenso hasta sentirte mejor. Si es súbito y muy intenso, aparece tras un golpe, o se acompaña de desmayo, confusión, debilidad, problemas para hablar o visión, busca atención urgente.',espalda:'Para una molestia leve, evita cargas que la empeoren y mantén movimiento suave. Si hay debilidad, pérdida de control de vejiga/intestino, entumecimiento en la zona genital o dolor tras un trauma importante, busca atención urgente.',rodilla:'Reduce temporalmente los movimientos que provocan dolor. No sigas corriendo si el dolor aumenta. Hinchazón importante, incapacidad para apoyar o una lesión traumática requieren valoración.',hombro:'Evita el movimiento que provoca dolor y no fuerces el rango. Dolor intenso después de una caída, deformidad o debilidad marcada requiere valoración.',músculo:'Una molestia muscular leve después del ejercicio puede mejorar con descanso relativo y movimiento suave. Dolor intenso, hinchazón marcada u orina muy oscura después de ejercicio intenso requieren atención médica.',pecho:'El dolor de pecho no debe evaluarse con una app. Si es intenso, opresivo, dura varios minutos, aparece con falta de aire, sudoración, náuseas, desmayo o dolor que se extiende a brazo, mandíbula o espalda, busca atención de emergencia.'};const box=document.getElementById('painResult');box.style.display='block';box.innerHTML=`<b>${type[0].toUpperCase()+type.slice(1)}</b><p style="margin:7px 0">${advice[type]}</p>`}
 
+
+function renderProfile(){
+ const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v??''};set('nameInput',state.name||'');set('emailInput',state.email||'');set('weightInput',state.weight||'');set('heightInput',state.height||'');set('sleepInput',state.sleepHours||'');set('goalInput',state.goal||'Ganar fuerza');const av=state.avatar||'';document.querySelectorAll('#profileAvatar,#sideAvatar').forEach(e=>{e.src=av||'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2292%22 height=%2292%22%3E%3Crect width=%2292%22 height=%2292%22 rx=%2246%22 fill=%22%23eeeeec%22/%3E%3Ctext x=%2246%22 y=%2254%22 text-anchor=%22middle%22 font-size=%2230%22%3E%F0%9F%91%A4%3C/text%3E%3C/svg%3E'});const n=document.getElementById('profileNameText');if(n)n.textContent=state.name||'Usuario FITFORGE';}
+
 // Extend profile fields with height/sleep if present in future versions.
-function renderNewModules(){renderRunHistory();renderCalendar();renderChat();renderWellness();renderNotificationPermission();updateInstall()}
+function renderNewModules(){renderRunHistory();renderCalendar();renderChat();renderWellness();renderNotificationPermission();updateInstall();renderProfile()}
 
 
 renderHome();renderStats();renderWorkouts();renderProgress();renderNotifications();renderScan();lucide.createIcons();

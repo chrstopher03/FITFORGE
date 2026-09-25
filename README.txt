@@ -1,42 +1,35 @@
-FITFORGE — paquete instalable y con backend opcional
+FITFORGE 2.0 — APP COMPLETA
 
-1) Modo rápido sin cuentas
-- Abre la app con un servidor local, no con file://.
-- Ejemplo: python -m http.server 8000
-- Abre http://localhost:8000
-- GPS/cámara/notificaciones requieren contexto seguro; localhost es aceptado por los navegadores para desarrollo.
+1. Requisitos
+- Node.js 20 o superior recomendado.
+- Navegador moderno (Chrome/Edge/Firefox/Safari).
+- Para cámara, GPS, notificaciones e instalación PWA: usa http://localhost:3000 o HTTPS.
 
-2) Modo completo con asistente y escaneo de comida por foto
-- Instala Node.js.
-- En esta carpeta ejecuta: npm install
-- Copia .env.example a .env y coloca OPENAI_API_KEY.
-- Ejecuta: npm start
-- Abre http://localhost:3000
-- El backend mantiene la API key fuera del navegador.
+2. Iniciar
+Windows: doble clic en start.bat
+Terminal: npm install && npm start
+Luego abre: http://localhost:3000
 
-3) Cuentas y sincronización en la nube
-- Crea un proyecto Supabase.
-- Ejecuta supabase_schema.sql en SQL Editor.
-- Edita config.js con supabaseUrl y supabaseAnonKey.
-- Para avatares, crea el bucket Storage "avatars" y aplica políticas de acceso por usuario.
+3. Cuentas
+FITFORGE incluye registro e inicio de sesión real en el servidor. Los usuarios y sus datos se guardan en fitforge-data.json. Para producción con muchos usuarios se recomienda migrar esa capa a PostgreSQL/Supabase.
 
-4) Funciones reales incluidas
-- Registro/inicio de sesión con Supabase cuando está configurado.
-- Sincronización del estado principal del usuario con Supabase.
-- Foto de perfil.
-- Escaneo facial real para detección, encuadre, orientación y calidad de captura; NO diagnostica salud ni mide grasa/peso desde la cara.
-- Escaneo de código de barras y consulta de producto con Open Food Facts.
-- Escaneo de comida por foto mediante endpoint de visión opcional del backend; entrega estimaciones, no valores exactos.
-- Carrera con GPS, distancia, tiempo, ritmo, mapa, historial y cámara trasera opcional.
-- Gimnasios cercanos con geolocalización y OpenStreetMap/Overpass.
-- Calendario, consejos, recetas, nutrición, agua, objetivos y bienestar.
-- Asistente con IA y búsqueda web cuando el backend está configurado.
-- Notificaciones web con permiso del usuario.
-- PWA instalable en navegadores compatibles.
+4. Asistente IA
+Copia .env.example como .env y coloca OPENAI_API_KEY. Sin clave, el asistente conserva un modo local de respaldo.
 
-5) Importante
-- No uses la app para diagnosticar lesiones o enfermedades.
-- GPS, cámara y notificaciones requieren permisos del usuario y, normalmente, HTTPS/localhost.
-- Los datos de gimnasios dependen de la cobertura de OpenStreetMap.
-- Los datos de Open Food Facts pueden estar incompletos.
-- Una foto de comida no puede determinar con precisión los gramos o calorías.
+5. Escáner facial
+Usa MediaPipe Face Mesh desde CDN. La cámara detecta el rostro en vivo y calcula un resultado real de calidad de captura, encuadre, orientación y estabilidad geométrica. No diagnostica salud ni mide grasa corporal/peso con la cara.
+
+6. Correr
+GPS real con distancia, tiempo, ritmo, mapa, historial y cámara trasera opcional. La precisión depende del teléfono y permisos.
+
+7. Gimnasios
+- Usa tu ubicación para consultar datos en vivo de OpenStreetMap/Overpass.
+- Incluye botón directo para Somoto, Madriz usando el centro de Somoto si no quieres compartir ubicación.
+- La cobertura depende de los datos publicados; no existe una fuente que garantice literalmente todos los gimnasios del mundo.
+
+8. Comida
+- Código de barras: consulta Open Food Facts.
+- Foto: usa el endpoint de IA y entrega una estimación, nunca una medición exacta.
+
+9. PWA
+La aplicación incluye manifest y service worker. En Chrome/Edge usa el botón Instalar del navegador o el banner de FITFORGE.
