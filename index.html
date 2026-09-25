@@ -666,7 +666,7 @@ button{font-family:inherit}
 
     <section id="notifications" class="view">
       <h1 class="page-title">Notificaciones</h1><p class="sub">Recordatorios y actividad de tu cuenta.</p>
-      <div class="form-card" style="margin-bottom:15px"><b>Notificaciones del teléfono</b><p class="sub" style="margin:5px 0 10px">Permite avisos del sistema para recordatorios y eventos de FITFORGE.</p><button class="primary" onclick="requestAppNotifications()"><i data-lucide="bell-ring"></i>Permitir notificaciones</button><p id="notificationPermission" class="source-note" style="margin:8px 0 0"></p></div>
+      <div class="form-card" style="margin-bottom:15px"><b>Notificaciones del teléfono</b><p class="sub" style="margin:5px 0 10px">Permite avisos del sistema para recordatorios y eventos de FITFORGE.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" onclick="enable15MinReminders()"><i data-lucide="bell-ring"></i>Activar cada 15 min</button><button class="secondary" onclick="requestAppNotifications()">Permitir notificaciones</button></div><p id="notificationPermission" class="source-note" style="margin:8px 0 0"></p></div>
       <div class="form-card" id="notificationsList"></div>
     </section>
 
@@ -759,7 +759,7 @@ function showView(id){
  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
  window.scrollTo({top:0,behavior:'smooth'}); if(id!=='scan')stopAutoFaceScan();
- if(id==='workouts')renderWorkouts(); if(id==='scan'){initFaceMesh().catch(()=>{});renderScan();} if(id==='progress')renderProgress(); if(id==='notifications')renderNotifications(); if(id==='gyms'){initGymMap();setTimeout(()=>gymMap?.invalidateSize(),80)}; if(id==='recipes')renderRecipes(); if(id==='nutrition')renderNutrition(); if(id==='water')renderWater(); if(id==='goals')renderGoals(); if(id==='run'){initRunMap();renderRunHistory();setTimeout(()=>runMap?.invalidateSize(),100)} if(id==='foodscan'){stopFoodCamera();document.getElementById('notificationPermission')?.removeAttribute('data-x')} if(id==='calendar')renderCalendar(); if(id==='assistant')renderChat(); if(id==='health')renderWellness();
+ if(id==='workouts')renderWorkouts(); if(id==='scan'){initFaceMesh().catch(()=>{});renderScan();} if(id==='progress')renderProgress(); if(id==='notifications')renderNotifications(); if(id==='gyms'){initGymMap();setTimeout(()=>{gymMap?.invalidateSize();if(!window.__gymsLoaded){window.__gymsLoaded=true;findGyms()}},80)}; if(id==='recipes')renderRecipes(); if(id==='nutrition')renderNutrition(); if(id==='water')renderWater(); if(id==='goals')renderGoals(); if(id==='run'){initRunMap();renderRunHistory();setTimeout(()=>runMap?.invalidateSize(),100)} if(id==='foodscan'){stopFoodCamera();document.getElementById('notificationPermission')?.removeAttribute('data-x')} if(id==='calendar')renderCalendar(); if(id==='assistant')renderChat(); if(id==='health')renderWellness();
 }
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 
@@ -778,27 +778,55 @@ function initGymMap(){
   gymMap=L.map(el,{zoomControl:true}).setView([13.0919,-86.3538],13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(gymMap);
 }
+async function fetchGymData(lat,lon,radius){
+  const local=`${FF.gymsEndpoint||'/api/gyms'}?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&radius=${encodeURIComponent(radius)}`;
+  try{const r=await fetch(local,{credentials:'same-origin',signal:AbortSignal.timeout(9000)});if(r.ok)return await r.json()}catch{}
+  const q=`[out:json][timeout:20];(nwr["leisure"="fitness_centre"](around:${radius},${lat},${lon});nwr["amenity"="gym"](around:${radius},${lat},${lon});nwr["sport"~"fitness|gym|bodybuilding",i](around:${radius},${lat},${lon});nwr["leisure"="sports_centre"](around:${radius},${lat},${lon}););out center tags;`;
+  for(const endpoint of ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://overpass.private.coffee/api/interpreter']){
+    try{const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({data:q}),signal:AbortSignal.timeout(12000)});if(r.ok)return await r.json()}catch{}
+  }
+  throw new Error('No se pudo consultar gimnasios')
+}
+const SOMOTO_FALLBACK_GYMS=[
+ {name:'Aries Gym Somoto',lat:13.47914,lon:-86.58022,address:'Somoto, Madriz',source:'Directorio público'},
+ {name:'Gym Power House',lat:13.47865,lon:-86.58319,address:'Somoto, Madriz',source:'Directorio público'},
+ {name:'Power Gym',lat:null,lon:null,address:'FCH8+GXJ, Somoto, Nicaragua',source:'Directorio público'},
+ {name:'Gimnasio de boxeo Luis Videa',lat:null,lon:null,address:'Somoto, Madriz',source:'Directorio público'},
+ {name:'Estadio de Béisbol Santiago',lat:null,lon:null,address:'FCMF+52Q, Somoto, Nicaragua',source:'Directorio público'}
+];
+function renderGymList(gyms,lat,lon,label){
+ const list=document.getElementById('gymList');const valid=gyms.filter(g=>Number.isFinite(g.lat)&&Number.isFinite(g.lon));
+ document.getElementById('gymCount').textContent=`${gyms.length} lugares deportivos encontrados`;
+ if(gymLayer){valid.forEach(g=>L.marker([g.lat,g.lon]).addTo(gymLayer).bindPopup(`<b>${escapeHTML(g.name)}</b>`))}
+ list.innerHTML=gyms.map(g=>{const d=Number.isFinite(g.lat)&&Number.isFinite(g.lon)?`${(haversine(lat,lon,g.lat,g.lon)/1000).toFixed(1)} km`:'Somoto';return `<article class="gym-item"><div class="gym-main"><div class="gym-icon"><i data-lucide="dumbbell"></i></div><div><h3>${escapeHTML(g.name)}</h3><p>${d}${g.address?' · '+escapeHTML(g.address):''}</p></div></div><div class="gym-actions"><button class="mini-btn" ${Number.isFinite(g.lat)&&Number.isFinite(g.lon)?`onclick="focusGym(${g.lat},${g.lon},'${escapeJS(g.name)}')"`:`onclick="searchGym('${escapeJS(g.name)}')"`}><i data-lucide="map"></i>Mapa</button><button class="mini-btn primary-mini" onclick="routeToGym(${Number.isFinite(g.lat)?g.lat:'null'},${Number.isFinite(g.lon)?g.lon:'null'},'${escapeJS(g.name)}')"><i data-lucide="navigation"></i>Ruta</button></div></article>`}).join('');lucide.createIcons();
+}
+function searchGym(name){window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name+', Somoto, Madriz, Nicaragua')}`,'_blank','noopener')}
 async function queryGymsAt(lat,lon,label='Tu ubicación'){
   initGymMap();const status=document.getElementById('locationStatus'),list=document.getElementById('gymList');const radius=Number(document.getElementById('gymRadius')?.value)||10000;
   status.textContent=`Buscando gimnasios en ${label}…`;gymMap.setView([lat,lon],14);if(gymLayer)gymLayer.clearLayers();gymLayer=L.layerGroup().addTo(gymMap);L.marker([lat,lon]).addTo(gymLayer).bindPopup(`<b>${escapeHTML(label)}</b>`).openPopup();
   try{
-    const endpoint=FF.gymsEndpoint||'/api/gyms';const url=endpoint.includes('?')?`${endpoint}&lat=${lat}&lon=${lon}&radius=${radius}`:`${endpoint}?lat=${lat}&lon=${lon}&radius=${radius}`;const r=await fetch(url);if(!r.ok)throw new Error('gyms');const data=await r.json();
-    const gyms=(data.elements||[]).map(x=>{const g=x.center||x,t=x.tags||{};return{id:x.id,name:t.name||'Gimnasio sin nombre',lat:g.lat,lon:g.lon,address:t['addr:street']||t['addr:full']||'',phone:t.phone||'',website:t.website||'',dist:haversine(lat,lon,g.lat,g.lon)}}).filter(x=>x.lat&&x.lon).sort((a,b)=>a.dist-b.dist).filter((x,i,a)=>i===a.findIndex(y=>y.name.toLowerCase()===x.name.toLowerCase()&&Math.abs(y.lat-x.lat)<.001&&Math.abs(y.lon-x.lon)<.001));
-    document.getElementById('gymCount').textContent=`${gyms.length} lugares deportivos encontrados`;if(!gyms.length){list.innerHTML='<div class="empty"><i data-lucide="search-x"></i><p>No hay gimnasios publicados en OpenStreetMap dentro del radio seleccionado.</p></div>'}else{gyms.forEach(g=>L.marker([g.lat,g.lon]).addTo(gymLayer).bindPopup(`<b>${escapeHTML(g.name)}</b><br>${(g.dist/1000).toFixed(1)} km`));list.innerHTML=gyms.map(g=>`<article class="gym-item"><div class="gym-main"><div class="gym-icon"><i data-lucide="dumbbell"></i></div><div><h3>${escapeHTML(g.name)}</h3><p>${(g.dist/1000).toFixed(1)} km${g.address?' · '+escapeHTML(g.address):''}</p></div></div><div class="gym-actions"><button class="mini-btn" onclick="focusGym(${g.lat},${g.lon},'${escapeJS(g.name)}')"><i data-lucide="map"></i>Mapa</button><button class="mini-btn primary-mini" onclick="routeToGym(${g.lat},${g.lon})"><i data-lucide="navigation"></i>Ruta</button></div></article>`).join('')}
-    status.textContent=`${label} · datos en vivo de OpenStreetMap`;lucide.createIcons();
-  }catch(e){list.innerHTML='<div class="empty"><i data-lucide="wifi-off"></i><p>No se pudo consultar el mapa. Inténtalo de nuevo.</p></div>';status.textContent='No se pudo actualizar la lista';lucide.createIcons()}
+    const data=await fetchGymData(lat,lon,radius);
+    const gyms=(data.elements||[]).map(x=>{const g=x.center||x,t=x.tags||{};return{id:x.id,name:t.name||'Centro deportivo sin nombre',lat:Number(g.lat),lon:Number(g.lon),address:t['addr:street']||t['addr:full']||t['addr:city']||''}}).filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon)).sort((a,b)=>haversine(lat,lon,a.lat,a.lon)-haversine(lat,lon,b.lat,b.lon)).filter((x,i,a)=>i===a.findIndex(y=>y.name.toLowerCase()===x.name.toLowerCase()&&Math.abs(y.lat-x.lat)<.001&&Math.abs(y.lon-x.lon)<.001));
+    if(gyms.length)renderGymList(gyms,lat,lon,label);else throw new Error('empty');
+    status.textContent=`${label} · datos en vivo de OpenStreetMap`;
+  }catch(e){
+    const isSomoto=Math.abs(lat-13.4837)<.08&&Math.abs(lon+86.5826)<.08;
+    if(isSomoto){renderGymList(SOMOTO_FALLBACK_GYMS,lat,lon,label);status.textContent=`${label} · directorio de respaldo`}
+    else{list.innerHTML='<div class="empty"><i data-lucide="wifi-off"></i><p>No se pudo conectar al servicio de mapas. Inténtalo de nuevo.</p></div>';status.textContent='Servicio de mapas sin conexión';}
+    lucide.createIcons();
+  }
 }
 async function findGyms(){
-  if(!navigator.geolocation){toast('Este navegador no permite geolocalización');return}
+  if(!navigator.geolocation){findSomotoGyms();return}
   const status=document.getElementById('locationStatus');status.textContent='Solicitando ubicación…';
-  navigator.geolocation.getCurrentPosition(pos=>queryGymsAt(pos.coords.latitude,pos.coords.longitude,`Tu ubicación · ±${Math.round(pos.coords.accuracy||0)} m`),err=>{status.textContent=err.code===1?'Permiso de ubicación denegado':'No se pudo obtener la ubicación';toast('Usa “Somoto, Madriz” para ver la zona sin compartir ubicación')},{enableHighAccuracy:true,timeout:15000,maximumAge:30000});
+  navigator.geolocation.getCurrentPosition(pos=>queryGymsAt(pos.coords.latitude,pos.coords.longitude,`Tu ubicación · ±${Math.round(pos.coords.accuracy||0)} m`),()=>{status.textContent='Ubicación no disponible · mostrando Somoto';findSomotoGyms()},{enableHighAccuracy:false,timeout:8000,maximumAge:120000});
 }
 function findSomotoGyms(){queryGymsAt(13.4837,-86.5826,'Somoto, Madriz')}
 function haversine(a,b,c,d){const R=6371000,rad=Math.PI/180;const x=(c-a)*rad,y=(d-b)*rad;const q=Math.sin(x/2)**2+Math.cos(a*rad)*Math.cos(c*rad)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(q))}
 function escapeHTML(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function escapeJS(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
 function focusGym(lat,lon,name){initGymMap();gymMap.setView([lat,lon],17);L.popup().setLatLng([lat,lon]).setContent(`<b>${escapeHTML(name)}</b>`).openOn(gymMap)}
-function routeToGym(lat,lon){window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`,'_blank','noopener')}
+function routeToGym(lat,lon,name=''){const url=Number.isFinite(lat)&&Number.isFinite(lon)?`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`:`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(name+', Somoto, Madriz, Nicaragua')}`;window.open(url,'_blank','noopener')}
 
 async function startCamera(){
   try{
@@ -1051,6 +1079,12 @@ async function loadCloudProfile(user){try{const {data:cloud}=await supa.from('us
 async function loadLocalServerProfile(){try{const r=await fetch(FF.stateEndpoint||'/api/me/state');if(!r.ok)return;const d=await r.json();if(d.state&&typeof d.state==='object'){state=Object.assign(JSON.parse(JSON.stringify(defaultState)),d.state);state.scan=state.scan||{before:null,after:null,beforeWeight:null,afterWeight:null,beforeFace:null,afterFace:null,lastFace:null,beforeShape:null,afterShape:null};state.runs=Array.isArray(state.runs)?state.runs:[];state.chat=Array.isArray(state.chat)?state.chat:[];state.foods=Array.isArray(state.foods)?state.foods:[];localStorage.setItem('fitforge_state',JSON.stringify(state))}renderStats();renderProgress();renderScan();renderNutrition();renderRunHistory();renderNotifications();renderProfile?.();renderChat()}catch(e){console.warn('Carga de cuenta:',e)}}
 async function changeAvatar(ev){const file=ev.target.files?.[0];if(!file)return;if(file.size>3*1024*1024){toast('La foto debe pesar menos de 3 MB');return}const reader=new FileReader();reader.onload=async()=>{state.avatar=reader.result;save();renderStats();renderProfile?.();toast('✓ Foto de perfil actualizada');if(supa&&window.FF_USER){try{const path=`${window.FF_USER.id}/avatar-${Date.now()}.${file.name.split('.').pop()||'jpg'}`;const {error}=await supa.storage.from('avatars').upload(path,file,{upsert:true});if(!error){const {data}=supa.storage.from('avatars').getPublicUrl(path);state.avatar=data.publicUrl;save();renderStats();await supa.from('profiles').upsert({id:window.FF_USER.id,name:state.name,avatar_url:data.publicUrl},{onConflict:'id'})}}catch(e){console.warn(e)}}else if(ffSessionUser){try{await fetch(FF.profileEndpoint||'/api/me/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:state.name,avatar:state.avatar})})}catch(e){console.warn(e)}}};reader.readAsDataURL(file)}
 async function requestAppNotifications(){if(!('Notification' in window)){toast('Este navegador no admite notificaciones web');return}if(!window.isSecureContext){toast('Las notificaciones requieren HTTPS o localhost');return}try{const p=await Notification.requestPermission();const el=document.getElementById('notificationPermission');if(el)el.textContent=p==='granted'?'✓ Notificaciones activadas':p==='denied'?'Notificaciones bloqueadas en el navegador':'No se concedió permiso';if(p==='granted'){if(navigator.serviceWorker?.ready){const reg=await navigator.serviceWorker.ready;reg.showNotification('FITFORGE',{body:'¡Listo! Recibirás avisos de tu actividad cuando la plataforma los envíe.',icon:'icon-192.png',badge:'icon-192.png'}).catch(()=>{})}toast('✓ Notificaciones activadas')}}catch(e){toast('No se pudo activar las notificaciones')}}
+let reminderTimer=null;
+const reminderMessages=['Toma agua 💧','Haz una pausa y muévete 2–5 minutos 🚶','Revisa tu próximo entrenamiento 🏋️','Corrige tu postura y respira profundo 🧘','¿Ya registraste tus alimentos? 🥗','Revisa tu progreso 📈'];
+function start15MinReminders(){if(reminderTimer)clearInterval(reminderTimer);if(localStorage.getItem('fitforge_15min_reminders')!=='1')return;reminderTimer=setInterval(send15MinReminder,15*60*1000)}
+function send15MinReminder(){const text=reminderMessages[Math.floor(Date.now()/900000)%reminderMessages.length];state.notifications.unshift({text:`Recordatorio FITFORGE: ${text}`,time:'Ahora',icon:'bell-ring'});state.notifications=state.notifications.slice(0,20);save();renderNotifications();if('Notification' in window&&Notification.permission==='granted'){if(navigator.serviceWorker?.controller)navigator.serviceWorker.controller.postMessage({type:'FITFORGE_REMINDER',title:'FITFORGE',body:text});else new Notification('FITFORGE',{body:text,icon:'icon-192.png'})}}
+async function enable15MinReminders(){if(!('Notification' in window)||!window.isSecureContext){toast('Los recordatorios del teléfono requieren HTTPS o localhost');return}const p=Notification.permission==='granted'?'granted':await Notification.requestPermission();if(p!=='granted'){toast('Permiso de notificaciones no concedido');return}localStorage.setItem('fitforge_15min_reminders','1');start15MinReminders();send15MinReminder();toast('✓ Recordatorios cada 15 minutos activados')}
+function disable15MinReminders(){localStorage.removeItem('fitforge_15min_reminders');if(reminderTimer)clearInterval(reminderTimer);reminderTimer=null;toast('Recordatorios desactivados')}
 function renderNotificationPermission(){const el=document.getElementById('notificationPermission');if(el&&'Notification' in window)el.textContent=Notification.permission==='granted'?'✓ Permiso concedido':Notification.permission==='denied'?'Bloqueadas en este navegador':'Pendientes de permiso'}
 function isAppInstalled(){
  try{return localStorage.getItem('fitforge_app_installed')==='1'||window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}catch{return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}
@@ -1177,7 +1211,7 @@ function renderNewModules(){renderRunHistory();renderCalendar();renderChat();ren
 
 
 renderHome();renderStats();renderWorkouts();renderProgress();renderNotifications();renderScan();lucide.createIcons();
-initAuth();renderNewModules();
+initAuth();renderNewModules();start15MinReminders();
 </script>
 </body>
 </html>
