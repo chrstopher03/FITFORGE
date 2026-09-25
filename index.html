@@ -392,6 +392,46 @@ button{font-family:inherit}
 }
 
 </style>
+
+<style id="mobile-nav-spacing-fix">
+@media (max-width:800px){
+  .mobile-nav{
+    display:flex!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    gap:7px!important;
+    width:calc(100% - 20px)!important;
+    max-width:520px!important;
+    height:68px!important;
+    padding:6px 8px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    scroll-snap-type:x proximity;
+    scrollbar-width:none;
+  }
+  .mobile-nav::-webkit-scrollbar{display:none}
+  .mobile-nav button{
+    flex:0 0 68px!important;
+    width:68px!important;
+    min-width:68px!important;
+    height:54px!important;
+    margin:0!important;
+    padding:5px 3px!important;
+    border-radius:15px!important;
+    gap:4px!important;
+    font-size:8px!important;
+    line-height:1.05!important;
+    white-space:normal!important;
+    scroll-snap-align:center;
+  }
+  .mobile-nav button svg{width:19px!important;height:19px!important;margin:0 auto!important}
+}
+@media (max-width:380px){
+  .mobile-nav{gap:6px!important;width:calc(100% - 14px)!important;padding-left:7px!important;padding-right:7px!important}
+  .mobile-nav button{flex-basis:64px!important;width:64px!important;min-width:64px!important;font-size:7.5px!important}
+}
+</style>
 </head>
 <body>
 <div id="authScreen" class="auth-screen hidden">
