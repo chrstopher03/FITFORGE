@@ -1,8 +1,1 @@
-{
-  "name":"fitforge-app",
-  "version":"2.0.0",
-  "private":true,
-  "type":"module",
-  "scripts":{"start":"node server.mjs"},
-  "dependencies":{"express":"^5.1.0","openai":"^5.12.2","dotenv":"^17.2.2"}
-}
+{"name":"fitforge","version":"2.1.0","private":true,"type":"module","scripts":{"start":"node server.mjs"},"engines":{"node":">=18"}}

@@ -6,16 +6,17 @@
 <meta name="theme-color" content="#ff5a00">
 <meta name="description" content="FITFORGE — entrenamiento, carrera, nutrición, progreso y bienestar">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon-192.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon-192.svg">
+<link rel="icon" href="icon-192.png" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>FITFORGE — Fitness App</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>window.FITFORGE_CONFIG=Object.assign({authEndpoint:"/api/auth",stateEndpoint:"/api/me/state",profileEndpoint:"/api/me/profile"},window.FITFORGE_CONFIG||{});</script>
 <script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -442,7 +443,7 @@ button{font-family:inherit}
     <div class="auth-tabs"><button id="loginTab" class="active" onclick="setAuthMode('login')">Iniciar sesión</button><button id="registerTab" onclick="setAuthMode('register')">Crear cuenta</button></div>
     <div id="authNameWrap" class="field" style="display:none"><label>Nombre</label><input id="authName" placeholder="Tu nombre"></div>
     <div class="field" style="margin-top:10px"><label>Correo electrónico</label><input id="authEmail" type="email" placeholder="tu@email.com" autocomplete="email"></div>
-    <div class="field" style="margin-top:10px"><label>Contraseña</label><input id="authPassword" type="password" placeholder="Mínimo 6 caracteres" autocomplete="current-password"></div>
+    <div class="field" style="margin-top:10px"><label>Contraseña</label><input id="authPassword" type="password" placeholder="Mínimo 8 caracteres" autocomplete="current-password"></div>
     <div class="auth-actions"><button class="primary" onclick="submitAuth()" id="authSubmit">Iniciar sesión</button><button class="secondary" onclick="continueGuest()">Probar sin cuenta</button></div>
     <p id="authStatus" class="auth-note" style="margin-top:12px"></p>
     <p class="auth-note">Puedes crear una cuenta directamente en FITFORGE. La aplicación guarda tu cuenta y progreso en el servidor incluido. Si no hay servidor, puedes usar el modo invitado.</p>
@@ -803,7 +804,7 @@ async function startCamera(){
   try{
     if(!navigator.mediaDevices?.getUserMedia)throw new Error('camera');
     if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());
-    cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'user'},width:{ideal:1280},height:{ideal:720}},audio:false});
+    cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'user'},width:{ideal:640},height:{ideal:480}},audio:false});
     const video=document.getElementById('cameraVideo');video.srcObject=cameraStream;await video.play().catch(()=>{});initFaceMesh();startAutoFaceScan();toast('✓ Sensor facial activo');
   }catch(e){toast('No se pudo abrir la cámara. Usa HTTPS o localhost y permite la cámara.')}
 }
@@ -849,11 +850,23 @@ function renderRecipes(){
 function toggleRecipeFav(id){state.recipeFavs=Array.isArray(state.recipeFavs)?state.recipeFavs:[];state.recipeFavs=state.recipeFavs.includes(id)?state.recipeFavs.filter(x=>x!==id):[...state.recipeFavs,id];save();renderRecipes()}
 document.querySelectorAll('[data-rfilter]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-rfilter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentRecipeFilter=b.dataset.rfilter;renderRecipes()}));
 
-function initFaceMesh(){
- if(faceMesh||typeof FaceMesh==='undefined')return;
- faceMesh=new FaceMesh({locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
- faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.45,minTrackingConfidence:.45});
- faceMesh.onResults(res=>{faceBusy=false;const lm=res.multiFaceLandmarks?.[0];if(!lm){setFaceUI(null);return} const m=faceMetrics(lm);state.scan.lastFace=m;setFaceUI(m);});
+let faceMeshPromise=null;
+async function initFaceMesh(){
+ if(faceMesh)return faceMesh;
+ if(faceMeshPromise)return faceMeshPromise;
+ faceMeshPromise=new Promise((resolve,reject)=>{
+   if(typeof FaceMesh!=='undefined')return resolve();
+   const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';sc.async=true;
+   sc.onload=()=>resolve();sc.onerror=()=>reject(new Error('face model'));
+   document.head.appendChild(sc);
+ }).then(()=>{
+   if(typeof FaceMesh==='undefined')throw new Error('FaceMesh unavailable');
+   faceMesh=new FaceMesh({locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
+   faceMesh.setOptions({maxNumFaces:1,refineLandmarks:false,minDetectionConfidence:.35,minTrackingConfidence:.35});
+   faceMesh.onResults(res=>{faceBusy=false;const lm=res.multiFaceLandmarks?.[0];if(!lm){setFaceUI(null);return} const m=faceMetrics(lm);state.scan.lastFace=m;setFaceUI(m);});
+   return faceMesh;
+ }).catch(e=>{faceMeshPromise=null;throw e});
+ return faceMeshPromise;
 }
 function faceMetrics(l){
  const xs=l.map(p=>p.x),ys=l.map(p=>p.y);const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const w=maxX-minX,h=maxY-minY;
@@ -873,10 +886,10 @@ function setFaceUI(m){
  dot.classList.add('ok');status.textContent='Rostro detectado · sensor activo';guide?.classList.remove('scanning');guide?.classList.add('detected');if(sensorText)sensorText.textContent=`ROSTRO DETECTADO · ${m.score}%`;
  document.getElementById('faceDetected').textContent='Sí';document.getElementById('faceFraming').textContent=m.framing?'Correcto':'Ajustar';document.getElementById('faceOrientation').textContent=m.orientation;document.getElementById('faceQuality').textContent=`${m.quality} · ${m.score}/100`;
  const v=document.getElementById('scanVerdict');if(v){let comparison=faceComparison();let cmp=comparison!==null?`<br><b>Comparación geométrica:</b> ${comparison<5?'muy estable':comparison<12?'cambio leve':'cambio visible'} (${comparison}% de variación relativa entre rasgos normalizados).`:'';v.innerHTML=`<b>Resultado del escaneo: ${m.score}/100</b><p style="margin:6px 0 0">Rostro detectado, encuadre ${m.framing?'válido':'mejorable'} y orientación ${escapeHTML(m.orientation.toLowerCase())}. Este resultado mide la calidad de la captura y rasgos geométricos visibles; no diagnostica salud ni calcula grasa corporal.</p>${cmp}`}}
-async function startAutoFaceScan(){if(faceScanInterval)clearInterval(faceScanInterval);faceScanInterval=setInterval(()=>{if(document.getElementById('cameraVideo')?.srcObject&&!faceBusy)analyzeLiveFace(true)},700)}
+async function startAutoFaceScan(){if(faceScanInterval)clearInterval(faceScanInterval);faceScanInterval=setInterval(()=>{if(document.getElementById('cameraVideo')?.srcObject&&!faceBusy)analyzeLiveFace(true)},350)}
 function stopAutoFaceScan(){if(faceScanInterval)clearInterval(faceScanInterval);faceScanInterval=null}
 async function analyzeLiveFace(silent=false){
- initFaceMesh(); if(!faceMesh){if(!silent)toast('No se pudo cargar el sensor facial. Comprueba tu conexión.');return false}
+ try{await initFaceMesh()}catch(e){if(!silent)toast('No se pudo cargar el sensor facial. Comprueba tu conexión.');return false} if(!faceMesh){if(!silent)toast('No se pudo cargar el sensor facial.');return false}
  const video=document.getElementById('cameraVideo');if(!video.srcObject||video.readyState<2){if(!silent)toast('Primero abre la cámara');return false} if(faceBusy)return !!state.scan.lastFace;faceBusy=true;try{state.scan.lastFace=null;await faceMesh.send({image:video});const ok=!!state.scan.lastFace;if(!silent)toast(ok?'✓ Rostro escaneado':'No se detectó un rostro');return ok}catch(e){faceBusy=false;if(!silent)toast('No se pudo analizar la cámara');return false}}
 function captureFaceAnalysis(type){return analyzeLiveFace().then(ok=>{if(ok&&state.scan.lastFace){state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));save();}})}
 function todayKey(){return new Date().toISOString().slice(0,10)}
@@ -1002,7 +1015,7 @@ async function logout(){try{if(supa)await supa.auth.signOut();else await fetch((
 async function loadCloudProfile(user){try{const {data:cloud}=await supa.from('user_state').select('state_json').eq('user_id',user.id).maybeSingle();if(cloud?.state_json){state=Object.assign(state,cloud.state_json);localStorage.setItem('fitforge_state',JSON.stringify(state))}const {data}=await supa.from('profiles').select('*').eq('id',user.id).maybeSingle();if(data){Object.assign(state,{name:data.name||state.name,email:user.email||state.email,weight:Number(data.weight)||state.weight,goal:data.goal||state.goal,avatar:data.avatar_url||state.avatar});localStorage.setItem('fitforge_state',JSON.stringify(state))}renderStats();renderProgress();renderScan();renderNutrition();renderRunHistory();renderNotifications();renderProfile?.()}catch(e){console.warn(e)}}
 async function loadLocalServerProfile(){try{const r=await fetch(FF.stateEndpoint||'/api/me/state');if(!r.ok)return;const d=await r.json();if(d.state&&typeof d.state==='object'){state=Object.assign(JSON.parse(JSON.stringify(defaultState)),d.state);state.scan=state.scan||{before:null,after:null,beforeWeight:null,afterWeight:null,beforeFace:null,afterFace:null,lastFace:null,beforeShape:null,afterShape:null};state.runs=Array.isArray(state.runs)?state.runs:[];state.chat=Array.isArray(state.chat)?state.chat:[];state.foods=Array.isArray(state.foods)?state.foods:[];localStorage.setItem('fitforge_state',JSON.stringify(state))}renderStats();renderProgress();renderScan();renderNutrition();renderRunHistory();renderNotifications();renderProfile?.();renderChat()}catch(e){console.warn('Carga de cuenta:',e)}}
 async function changeAvatar(ev){const file=ev.target.files?.[0];if(!file)return;if(file.size>3*1024*1024){toast('La foto debe pesar menos de 3 MB');return}const reader=new FileReader();reader.onload=async()=>{state.avatar=reader.result;save();renderStats();renderProfile?.();toast('✓ Foto de perfil actualizada');if(supa&&window.FF_USER){try{const path=`${window.FF_USER.id}/avatar-${Date.now()}.${file.name.split('.').pop()||'jpg'}`;const {error}=await supa.storage.from('avatars').upload(path,file,{upsert:true});if(!error){const {data}=supa.storage.from('avatars').getPublicUrl(path);state.avatar=data.publicUrl;save();renderStats();await supa.from('profiles').upsert({id:window.FF_USER.id,name:state.name,avatar_url:data.publicUrl},{onConflict:'id'})}}catch(e){console.warn(e)}}else if(ffSessionUser){try{await fetch(FF.profileEndpoint||'/api/me/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:state.name,avatar:state.avatar})})}catch(e){console.warn(e)}}};reader.readAsDataURL(file)}
-async function requestAppNotifications(){if(!('Notification' in window)){toast('Este navegador no admite notificaciones web');return}if(!window.isSecureContext){toast('Las notificaciones requieren HTTPS o localhost');return}try{const p=await Notification.requestPermission();const el=document.getElementById('notificationPermission');if(el)el.textContent=p==='granted'?'✓ Notificaciones activadas':p==='denied'?'Notificaciones bloqueadas en el navegador':'No se concedió permiso';if(p==='granted'){if(navigator.serviceWorker?.ready){const reg=await navigator.serviceWorker.ready;reg.showNotification('FITFORGE',{body:'¡Listo! Recibirás avisos de tu actividad cuando la plataforma los envíe.',icon:'icon-192.svg',badge:'icon-192.svg'}).catch(()=>{})}toast('✓ Notificaciones activadas')}}catch(e){toast('No se pudo activar las notificaciones')}}
+async function requestAppNotifications(){if(!('Notification' in window)){toast('Este navegador no admite notificaciones web');return}if(!window.isSecureContext){toast('Las notificaciones requieren HTTPS o localhost');return}try{const p=await Notification.requestPermission();const el=document.getElementById('notificationPermission');if(el)el.textContent=p==='granted'?'✓ Notificaciones activadas':p==='denied'?'Notificaciones bloqueadas en el navegador':'No se concedió permiso';if(p==='granted'){if(navigator.serviceWorker?.ready){const reg=await navigator.serviceWorker.ready;reg.showNotification('FITFORGE',{body:'¡Listo! Recibirás avisos de tu actividad cuando la plataforma los envíe.',icon:'icon-192.png',badge:'icon-192.png'}).catch(()=>{})}toast('✓ Notificaciones activadas')}}catch(e){toast('No se pudo activar las notificaciones')}}
 function renderNotificationPermission(){const el=document.getElementById('notificationPermission');if(el&&'Notification' in window)el.textContent=Notification.permission==='granted'?'✓ Permiso concedido':Notification.permission==='denied'?'Bloqueadas en este navegador':'Pendientes de permiso'}
 function isAppInstalled(){
  try{return localStorage.getItem('fitforge_app_installed')==='1'||window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}catch{return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}
