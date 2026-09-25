@@ -1004,9 +1004,38 @@ async function loadLocalServerProfile(){try{const r=await fetch(FF.stateEndpoint
 async function changeAvatar(ev){const file=ev.target.files?.[0];if(!file)return;if(file.size>3*1024*1024){toast('La foto debe pesar menos de 3 MB');return}const reader=new FileReader();reader.onload=async()=>{state.avatar=reader.result;save();renderStats();renderProfile?.();toast('✓ Foto de perfil actualizada');if(supa&&window.FF_USER){try{const path=`${window.FF_USER.id}/avatar-${Date.now()}.${file.name.split('.').pop()||'jpg'}`;const {error}=await supa.storage.from('avatars').upload(path,file,{upsert:true});if(!error){const {data}=supa.storage.from('avatars').getPublicUrl(path);state.avatar=data.publicUrl;save();renderStats();await supa.from('profiles').upsert({id:window.FF_USER.id,name:state.name,avatar_url:data.publicUrl},{onConflict:'id'})}}catch(e){console.warn(e)}}else if(ffSessionUser){try{await fetch(FF.profileEndpoint||'/api/me/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:state.name,avatar:state.avatar})})}catch(e){console.warn(e)}}};reader.readAsDataURL(file)}
 async function requestAppNotifications(){if(!('Notification' in window)){toast('Este navegador no admite notificaciones web');return}if(!window.isSecureContext){toast('Las notificaciones requieren HTTPS o localhost');return}try{const p=await Notification.requestPermission();const el=document.getElementById('notificationPermission');if(el)el.textContent=p==='granted'?'✓ Notificaciones activadas':p==='denied'?'Notificaciones bloqueadas en el navegador':'No se concedió permiso';if(p==='granted'){if(navigator.serviceWorker?.ready){const reg=await navigator.serviceWorker.ready;reg.showNotification('FITFORGE',{body:'¡Listo! Recibirás avisos de tu actividad cuando la plataforma los envíe.',icon:'icon-192.svg',badge:'icon-192.svg'}).catch(()=>{})}toast('✓ Notificaciones activadas')}}catch(e){toast('No se pudo activar las notificaciones')}}
 function renderNotificationPermission(){const el=document.getElementById('notificationPermission');if(el&&'Notification' in window)el.textContent=Notification.permission==='granted'?'✓ Permiso concedido':Notification.permission==='denied'?'Bloqueadas en este navegador':'Pendientes de permiso'}
-function updateInstall(){const b=document.getElementById('installBanner');if(!b)return;if(deferredInstall)b.classList.add('show');else if(window.matchMedia('(display-mode: standalone)').matches)b.classList.remove('show')}
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;updateInstall()});window.addEventListener('appinstalled',()=>{deferredInstall=null;document.getElementById('installBanner')?.classList.remove('show');toast('✓ FITFORGE instalada')});
-async function installApp(){if(!deferredInstall){toast('En iPhone usa Compartir → Añadir a pantalla de inicio. En Chrome/Edge busca Instalar app.');return}deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;updateInstall()}
+function isAppInstalled(){
+ try{return localStorage.getItem('fitforge_app_installed')==='1'||window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}catch{return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}
+}
+function updateInstall(){
+ const b=document.getElementById('installBanner');
+ if(!b)return;
+ if(isAppInstalled()){b.classList.remove('show');b.style.display='none';return}
+ b.style.display='';
+ if(deferredInstall)b.classList.add('show');else b.classList.remove('show');
+}
+window.addEventListener('beforeinstallprompt',e=>{
+ if(isAppInstalled()){e.preventDefault();return}
+ e.preventDefault();deferredInstall=e;updateInstall();
+});
+window.addEventListener('appinstalled',()=>{
+ try{localStorage.setItem('fitforge_app_installed','1')}catch{}
+ deferredInstall=null;
+ const b=document.getElementById('installBanner');
+ if(b){b.classList.remove('show');b.style.display='none'}
+ toast('✓ FITFORGE instalada');
+});
+async function installApp(){
+ if(isAppInstalled()){updateInstall();return}
+ if(!deferredInstall){toast('En iPhone usa Compartir → Añadir a pantalla de inicio. En Chrome/Edge busca Instalar app.');return}
+ try{
+  deferredInstall.prompt();
+  const choice=await deferredInstall.userChoice;
+  if(choice?.outcome==='accepted'){try{localStorage.setItem('fitforge_app_installed','1')}catch{}}
+ }catch{}
+ deferredInstall=null;
+ updateInstall();
+}
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 
 function initRunMap(){if(runMap)return;const el=document.getElementById('runMap');if(!el)return;runMap=L.map(el).setView([13.0919,-86.3538],14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(runMap);runLayer=L.layerGroup().addTo(runMap)}
