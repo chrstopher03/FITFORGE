@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: fitforge
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+    disk:
+      name: fitforge-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
