@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -112,6 +113,18 @@ button{cursor:pointer;border:0}
 @media(max-width:900px){.scan-grid{grid-template-columns:1fr}#gymMap{height:300px}}
 @media(max-width:800px){.location-bar{align-items:stretch}.location-bar .primary{width:100%;justify-content:center}.location-status{flex:1}.gym-item{align-items:flex-start;flex-direction:column}.gym-actions{width:100%}.gym-actions .mini-btn{flex:1;justify-content:center}.scan-photos{grid-template-columns:1fr}.camera-box,#cameraVideo{height:300px;min-height:300px}.scan-metrics{grid-template-columns:1fr 1fr}.scan-card{padding:15px}}
 
+
+/* ===== Módulos avanzados ===== */
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}.quick-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}.quick-card small{color:#888}.quick-card b{display:block;font-size:24px;margin:5px 0}.progress-line{height:9px;background:#eee;border-radius:20px;overflow:hidden}.progress-line i{display:block;height:100%;background:var(--orange);border-radius:20px}.measure-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.goal-box{background:#111;color:#fff;border-radius:22px;padding:20px}.goal-box .progress-line{background:#333}.goal-box .progress-line i{background:var(--orange)}.water-controls{display:flex;gap:8px;flex-wrap:wrap}.water-glass{width:42px;height:42px;border-radius:12px;background:#eef7ff;border:1px solid #d9eefe;color:#1681c4;font-weight:800}.food-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line)}.food-row:last-child{border-bottom:0}.badge{display:inline-flex;padding:6px 9px;border-radius:9px;background:var(--soft);color:var(--orange);font-size:10px;font-weight:800}.gym-toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.gym-toolbar select{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px}.gym-count{font-size:12px;color:#888}.scan-score{display:flex;align-items:center;gap:15px;padding:15px;background:#f7f7f5;border-radius:17px;margin-top:15px}.score-ring{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--orange) 0 72%,#e8e8e6 72%)}.score-ring:after{content:'72%';width:54px;height:54px;background:#fff;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px}.history-photo{font-size:11px;color:#888}.privacy-note{font-size:11px;color:#777;line-height:1.5}.export-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+@media(max-width:1000px){.quick-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:800px){.quick-grid{grid-template-columns:1fr 1fr}.measure-grid{grid-template-columns:1fr}.gym-toolbar>*{flex:1}.gym-toolbar select{width:100%}}
+
+/* ===== Escaneo facial real + recetas ===== */
+.face-result{margin-top:16px;padding:16px;border-radius:18px;background:#f7f7f5;border:1px solid var(--line)}
+.face-status{display:flex;align-items:center;gap:9px;font-weight:800;font-size:13px;margin-bottom:12px}.face-dot{width:10px;height:10px;border-radius:50%;background:#bbb}.face-dot.ok{background:var(--green)}
+.face-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.face-stat{background:#fff;border:1px solid var(--line);border-radius:13px;padding:11px}.face-stat small{display:block;color:#888;font-size:10px}.face-stat b{display:block;margin-top:4px;font-size:14px}
+.scan-actions{display:flex;gap:8px;flex-wrap:wrap}.recipe-card{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}.recipe-card img{width:100%;height:170px;object-fit:cover}.recipe-body{padding:17px}.recipe-body h3{margin:0 0 6px}.recipe-meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.recipe-meta span{font-size:10px;background:#f7f7f5;border-radius:8px;padding:6px 8px;color:#666}.recipe-ingredients{margin:12px 0;padding-left:18px;color:#666;font-size:12px;line-height:1.6}.recipe-steps{font-size:12px;color:#555;line-height:1.55}.recipe-fav{float:right;width:38px;height:38px;border-radius:11px;background:var(--soft);color:var(--orange)}
+@media(max-width:800px){.face-grid{grid-template-columns:1fr 1fr}.recipe-card img{height:190px}}
 </style>
 </head>
 <body>
@@ -124,6 +137,7 @@ button{cursor:pointer;border:0}
       <button class="nav-btn" data-view="progress"><i data-lucide="chart-no-axes-combined"></i>Progreso</button>
 <button class="nav-btn" data-view="gyms"><i data-lucide="map-pin"></i>Gimnasios cercanos</button>
 <button class="nav-btn" data-view="scan"><i data-lucide="scan-face"></i>Escaneo de progreso</button>
+<button class="nav-btn" data-view="recipes"><i data-lucide="utensils"></i>Recetas saludables</button>
       <button class="nav-btn" data-view="notifications"><i data-lucide="bell"></i>Notificaciones</button>
       <button class="nav-btn" data-view="profile"><i data-lucide="user-round"></i>Perfil</button>
     </div>
@@ -192,6 +206,7 @@ button{cursor:pointer;border:0}
         <button class="primary" onclick="findGyms()"><i data-lucide="locate-fixed"></i> Usar mi ubicación</button>
         <div class="location-status" id="locationStatus">Ubicación no consultada</div>
       </div>
+      <div class="gym-toolbar"><select id="gymRadius"><option value="5000">5 km</option><option value="10000" selected>10 km</option><option value="20000">20 km</option><option value="50000">50 km</option></select><span class="gym-count" id="gymCount">0 gimnasios encontrados</span></div>
       <div class="grid grid-2">
         <div class="map-card"><div id="gymMap"></div></div>
         <div class="map-card">
@@ -216,8 +231,9 @@ button{cursor:pointer;border:0}
           </div>
           <div class="camera-controls">
             <button class="primary" onclick="startCamera()"><i data-lucide="camera"></i>Abrir cámara</button>
-            <button class="secondary" onclick="captureScan('before')">Guardar foto inicial</button>
-            <button class="secondary" onclick="captureScan('after')">Guardar foto actual</button>
+            <button class="secondary" onclick="captureScan('before')">Escanear y guardar inicial</button>
+            <button class="secondary" onclick="captureScan('after')">Escanear y guardar actual</button>
+            <button class="mini-btn" onclick="analyzeLiveFace()"><i data-lucide="scan-face"></i>Detectar rostro</button>
           </div>
           <canvas id="scanCanvas" style="display:none"></canvas>
           <div class="field" style="margin-top:15px">
@@ -244,10 +260,42 @@ button{cursor:pointer;border:0}
             <div class="scan-metric"><small>Peso actual</small><b id="scanAfterWeight">—</b></div>
             <div class="scan-metric"><small>Cambio</small><b id="scanWeightDiff">—</b></div>
           </div>
+          <div class="face-result" id="faceResult"><div class="face-status"><span class="face-dot" id="faceDot"></span><span id="faceStatus">Sin escaneo facial todavía</span></div><div class="face-grid"><div class="face-stat"><small>Detección</small><b id="faceDetected">—</b></div><div class="face-stat"><small>Encuadre</small><b id="faceFraming">—</b></div><div class="face-stat"><small>Orientación</small><b id="faceOrientation">—</b></div><div class="face-stat"><small>Calidad de captura</small><b id="faceQuality">—</b></div></div><p class="privacy-note" style="margin-bottom:0;margin-top:10px">El análisis detecta rasgos geométricos visibles para mejorar la comparación de fotos. No estima edad, identidad, emociones, grasa corporal, enfermedades ni peso a partir del rostro.</p></div>
           <div class="disclaimer"><b>Importante:</b> la cámara sirve para documentar tu progreso visual; una foto por sí sola no puede determinar cuánto peso has perdido ni medir grasa corporal con precisión. Para comparar mejor, usa la misma iluminación, distancia y postura.</div>
           <button class="secondary" style="margin-top:12px" onclick="clearScan()">Borrar fotos y mediciones</button>
         </div>
       </div>
+    </section>
+
+    <section id="nutrition" class="view">
+      <h1 class="page-title">Nutrición</h1><p class="sub">Registra comidas y controla tus calorías de forma sencilla.</p>
+      <div class="grid grid-3">
+        <div class="stats orange-card"><span class="stat-title">Calorías consumidas</span><div class="stat-value" id="foodCalories">0</div><span class="stat-unit">kcal hoy</span></div>
+        <div class="stats"><span class="stat-title">Objetivo diario</span><div class="stat-value" id="foodGoal">2000</div><span class="stat-unit">kcal</span></div>
+        <div class="stats"><span class="stat-title">Restantes</span><div class="stat-value" id="foodRemaining">2000</div><span class="stat-unit">kcal</span></div>
+      </div>
+      <div class="section-head"><h2>Agregar comida</h2></div>
+      <div class="form-card"><div class="form-row"><div class="field"><label>Comida</label><input id="foodName" placeholder="Ej. Pollo con arroz"></div><div class="field"><label>Calorías</label><input id="foodKcal" type="number" placeholder="450"></div></div><button class="primary" onclick="addFood()">Agregar comida</button><div id="foodList" style="margin-top:15px"></div></div>
+    </section>
+
+    <section id="water" class="view">
+      <h1 class="page-title">Hidratación</h1><p class="sub">Lleva el control del agua que tomas durante el día.</p>
+      <div class="grid grid-2"><div class="stats orange-card"><span class="stat-title">Agua de hoy</span><div class="stat-value" id="waterValue">0</div><span class="stat-unit">ml</span></div><div class="stats"><span class="stat-title">Objetivo</span><div class="stat-value" id="waterGoal">2500</div><span class="stat-unit">ml</span></div></div>
+      <div class="form-card" style="margin-top:20px"><h3 style="margin-top:0">Agregar agua</h3><div class="water-controls"><button class="water-glass" onclick="addWater(250)">250</button><button class="water-glass" onclick="addWater(350)">350</button><button class="water-glass" onclick="addWater(500)">500</button><button class="water-glass" onclick="addWater(750)">750</button></div><div class="progress-line" style="margin-top:20px"><i id="waterBar" style="width:0%"></i></div><p id="waterText" class="sub" style="margin-top:10px;margin-bottom:0">0 de 2500 ml</p></div>
+    </section>
+
+    <section id="goals" class="view">
+      <h1 class="page-title">Objetivos</h1><p class="sub">Define metas y mide tu avance.</p>
+      <div class="goal-box"><span class="eyebrow">Meta de peso</span><div style="display:flex;justify-content:space-between;align-items:end;gap:10px"><div><h2 id="goalWeightTitle" style="margin:7px 0">—</h2><span style="color:#aaa;font-size:12px">peso objetivo</span></div><span id="goalWeightPercent" class="badge">0%</span></div><div class="progress-line" style="margin-top:18px"><i id="goalWeightBar" style="width:0%"></i></div></div>
+      <div class="form-card" style="margin-top:20px"><h3 style="margin-top:0">Configurar objetivo</h3><div class="form-row"><div class="field"><label>Peso objetivo (kg)</label><input id="targetWeight" type="number" step="0.1"></div><div class="field"><label>Entrenamientos por semana</label><input id="targetSessions" type="number" min="1" max="14"></div></div><button class="primary" onclick="saveGoals()">Guardar objetivos</button></div>
+    </section>
+
+    <section id="recipes" class="view">
+      <h1 class="page-title">Recetas saludables</h1>
+      <p class="sub">Ideas sencillas para comer mejor. Puedes filtrar según tu objetivo y abrir cada receta para ver ingredientes y preparación.</p>
+      <div class="filters" id="recipeFilters"><button class="filter active" data-rfilter="all">Todas</button><button class="filter" data-rfilter="breakfast">Desayunos</button><button class="filter" data-rfilter="lunch">Almuerzos</button><button class="filter" data-rfilter="dinner">Cenas</button><button class="filter" data-rfilter="snack">Snacks</button></div>
+      <div class="search"><i data-lucide="search"></i><input id="recipeSearch" placeholder="Buscar receta..." oninput="renderRecipes()"></div>
+      <div class="grid grid-3" id="recipeList"></div>
     </section>
 
     <section id="notifications" class="view">
@@ -278,6 +326,9 @@ button{cursor:pointer;border:0}
     <button data-view="progress"><i data-lucide="chart-no-axes-combined"></i>Progreso</button>
     <button data-view="gyms"><i data-lucide="map-pin"></i>Gimnasios</button>
     <button data-view="scan"><i data-lucide="scan-face"></i>Escaneo</button>
+    <button data-view="recipes"><i data-lucide="utensils"></i>Recetas</button>
+    <button data-view="nutrition"><i data-lucide="apple"></i>Nutrición</button>
+    <button data-view="water"><i data-lucide="droplets"></i>Agua</button>
     <button data-view="notifications"><i data-lucide="bell"></i>Alertas</button>
     <button data-view="profile"><i data-lucide="user-round"></i>Perfil</button>
   </nav>
@@ -300,7 +351,7 @@ const workouts=[
 
 const defaultState={
  name:'Monica Spencer',email:'monica@example.com',weight:63,goal:'Ganar fuerza',
- calories:0,sessions:0,minutes:0,streak:4,
+ calories:0,sessions:0,minutes:0,streak:4,water:0,waterGoal:2500,foodGoal:2000,foods:[],targetWeight:60,targetSessions:5,measurements:[],
  history:[], notifications:[
   {text:'Tu entrenamiento de hoy está listo.',time:'Ahora',icon:'dumbbell'},
   {text:'Llevas 4 días de racha. ¡Sigue así!',time:'Hoy',icon:'flame'},
@@ -309,9 +360,22 @@ const defaultState={
 };
 let state=JSON.parse(localStorage.getItem('fitforge_state')||'null')||defaultState;
 let currentFilter='all',timer=null,seconds=0,currentWorkout=null;
-state.scan=state.scan||{before:null,after:null,beforeWeight:null,afterWeight:null};
+state.scan=state.scan||{before:null,after:null,beforeWeight:null,afterWeight:null,beforeFace:null,afterFace:null,lastFace:null};
+state.scan.beforeFace=state.scan.beforeFace||null;state.scan.afterFace=state.scan.afterFace||null;state.scan.lastFace=state.scan.lastFace||null; state.water=Number(state.water)||0; state.waterGoal=Number(state.waterGoal)||2500; state.foodGoal=Number(state.foodGoal)||2000; state.foods=Array.isArray(state.foods)?state.foods:[]; state.targetWeight=Number(state.targetWeight)||60; state.targetSessions=Number(state.targetSessions)||5; state.measurements=Array.isArray(state.measurements)?state.measurements:[];state.recipeFavs=Array.isArray(state.recipeFavs)?state.recipeFavs:[];
 let gymMap=null,gymLayer=null,cameraStream=null;
 
+const recipes=[
+ {id:'avena',cat:'breakfast',title:'Avena con banano y yogur',time:10,kcal:380,tag:'Desayuno',img:'https://images.unsplash.com/photo-1517673400267-0251440c45dc?auto=format&fit=crop&w=900&q=85',ingredients:['½ taza de avena','1 banano','¾ taza de yogur natural','Canela al gusto'],steps:'Cocina la avena con agua o leche. Sirve con yogur, banano en rodajas y canela.'},
+ {id:'huevos',cat:'breakfast',title:'Huevos con vegetales y tortilla',time:15,kcal:410,tag:'Proteína',img:'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=85',ingredients:['2 huevos','Tomate y cebolla','Espinaca','1 tortilla de maíz'],steps:'Saltea los vegetales, agrega los huevos batidos y cocina. Acompaña con tortilla.'},
+ {id:'pollo',cat:'lunch',title:'Pollo a la plancha con arroz y ensalada',time:25,kcal:560,tag:'Almuerzo',img:'https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=900&q=85',ingredients:['150 g de pollo','¾ taza de arroz cocido','Lechuga, tomate y pepino','Limón y especias'],steps:'Sazona y cocina el pollo a la plancha. Sirve con arroz y una ensalada fresca.'},
+ {id:'atun',cat:'lunch',title:'Ensalada de atún y frijoles',time:12,kcal:450,tag:'Rápida',img:'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85',ingredients:['1 lata de atún','½ taza de frijoles cocidos','Tomate','Pepino','Limón'],steps:'Mezcla todos los ingredientes y adereza con limón, pimienta y una pequeña cantidad de aceite.'},
+ {id:'pescado',cat:'dinner',title:'Pescado al horno con verduras',time:30,kcal:430,tag:'Cena',img:'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85',ingredients:['150 g de pescado','Brócoli','Zanahoria','Calabacín','Limón'],steps:'Coloca pescado y verduras en una bandeja, sazona y hornea hasta que el pescado esté bien cocido.'},
+ {id:'bowl',cat:'dinner',title:'Bowl de pollo, aguacate y vegetales',time:20,kcal:520,tag:'Cena completa',img:'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85',ingredients:['120 g de pollo','½ aguacate','Vegetales variados','½ taza de arroz'],steps:'Cocina el pollo, prepara los vegetales y arma el bowl con arroz y aguacate.'},
+ {id:'yogur',cat:'snack',title:'Yogur con fruta y nueces',time:5,kcal:250,tag:'Snack',img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=900&q=85',ingredients:['1 taza de yogur natural','Fruta de temporada','1 cucharada de nueces'],steps:'Sirve el yogur y añade fruta troceada y nueces.'},
+ {id:'smoothie',cat:'snack',title:'Batido de banano y avena',time:5,kcal:300,tag:'Post-entreno',img:'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=900&q=85',ingredients:['1 banano','½ taza de yogur','2 cucharadas de avena','Agua o leche'],steps:'Licúa todos los ingredientes hasta obtener una mezcla homogénea.'}
+];
+let currentRecipeFilter='all';
+let faceMesh=null,faceBusy=false;
 function save(){localStorage.setItem('fitforge_state',JSON.stringify(state))}
 function money(n){return Math.round(n).toLocaleString('es-NI')}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2200)}
@@ -319,7 +383,7 @@ function showView(id){
  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
  window.scrollTo({top:0,behavior:'smooth'});
- if(id==='workouts')renderWorkouts(); if(id==='progress')renderProgress(); if(id==='notifications')renderNotifications(); if(id==='gyms')initGymMap(); if(id==='scan')renderScan();
+ if(id==='workouts')renderWorkouts(); if(id==='progress')renderProgress(); if(id==='notifications')renderNotifications(); if(id==='gyms')initGymMap(); if(id==='scan')renderScan(); if(id==='recipes')renderRecipes(); if(id==='nutrition')renderNutrition(); if(id==='water')renderWater(); if(id==='goals')renderGoals();
 }
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 
@@ -357,7 +421,7 @@ async function findGyms(){
     if(gymLayer)gymLayer.clearLayers();
     gymLayer=L.layerGroup().addTo(gymMap);
     L.marker([lat,lon]).addTo(gymLayer).bindPopup('<b>Tu ubicación</b>').openPopup();
-    const query=`[out:json][timeout:15];(node["leisure"="fitness_centre"](around:7000,${lat},${lon});way["leisure"="fitness_centre"](around:7000,${lat},${lon});node["sport"="fitness"](around:7000,${lat},${lon});way["sport"="fitness"](around:7000,${lat},${lon}););out center tags;`;
+    const radius=Number(document.getElementById('gymRadius')?.value)||10000; const query=`[out:json][timeout:25];(nwr["leisure"="fitness_centre"](around:${radius},${lat},${lon});nwr["sport"="fitness"](around:${radius},${lat},${lon});nwr["leisure"="sports_centre"](around:${radius},${lat},${lon});nwr["amenity"="gym"](around:${radius},${lat},${lon}););out center tags;`;
     try{
       const r=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',headers:{'Content-Type':'text/plain'},body:query});
       if(!r.ok)throw new Error('Overpass');
@@ -365,8 +429,8 @@ async function findGyms(){
       const gyms=(data.elements||[]).map(x=>{
         const g=x.center||x; const t=x.tags||{};
         return {id:x.id,name:t.name||'Gimnasio sin nombre',lat:g.lat,lon:g.lon,address:t['addr:street']||t['addr:full']||'',phone:t.phone||'',website:t.website||'',dist:haversine(lat,lon,g.lat,g.lon)};
-      }).filter(x=>x.lat&&x.lon).sort((a,b)=>a.dist-b.dist).slice(0,15);
-      if(!gyms.length){
+      }).filter(x=>x.lat&&x.lon).sort((a,b)=>a.dist-b.dist).filter((x,i,a)=>i===a.findIndex(y=>y.name.toLowerCase()===x.name.toLowerCase()&&Math.abs(y.lat-x.lat)<0.001&&Math.abs(y.lon-x.lon)<0.001));
+      document.getElementById('gymCount').textContent=`${gyms.length} gimnasios encontrados`; if(!gyms.length){
         list.innerHTML='<div class="empty"><i data-lucide="search-x"></i><p>No encontramos gimnasios registrados cerca de tu ubicación.</p></div>';
       }else{
         gyms.forEach(g=>L.marker([g.lat,g.lon]).addTo(gymLayer).bindPopup(`<b>${escapeHTML(g.name)}</b><br>${(g.dist/1000).toFixed(1)} km`));
@@ -402,14 +466,17 @@ async function startCamera(){
     toast('✓ Cámara activada');
   }catch(e){toast('No se pudo abrir la cámara. Revisa el permiso del navegador.')}
 }
-function captureScan(type){
+async function captureScan(type){
   const video=document.getElementById('cameraVideo');
   if(!video.srcObject || video.readyState<2){toast('Primero abre la cámara');return}
+  initFaceMesh();
+  if(faceMesh){try{faceBusy=true;await faceMesh.send({image:video});}catch(e){faceBusy=false}}
   const canvas=document.getElementById('scanCanvas');
   canvas.width=video.videoWidth||640;canvas.height=video.videoHeight||480;
   canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
   state.scan[type]=canvas.toDataURL('image/jpeg',.86);
-  save();renderScan();toast(type==='before'?'✓ Foto inicial guardada':'✓ Foto actual guardada');
+  if(state.scan.lastFace)state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));
+  save();renderScan();toast(type==='before'?'✓ Escaneo inicial guardado':'✓ Escaneo actual guardado');
 }
 function saveScanWeight(){
   const value=Number(document.getElementById('scanWeight').value);
@@ -424,16 +491,54 @@ function renderScan(){
   ap.innerHTML=s.after?`<img src="${s.after}" alt="Foto actual">`:'<span>Sin foto actual</span>';
   document.getElementById('scanBeforeWeight').textContent=s.beforeWeight?`${s.beforeWeight} kg`:'—';
   document.getElementById('scanAfterWeight').textContent=s.afterWeight?`${s.afterWeight} kg`:'—';
-  const diff=(s.beforeWeight&&s.afterWeight)?s.afterWeight-s.beforeWeight:null;
+  const diff=(s.beforeWeight!=null&&s.afterWeight!=null)?s.afterWeight-s.beforeWeight:null;
   const el=document.getElementById('scanWeightDiff');
-  if(diff===null){el.textContent='—';el.className=''}
-  else{el.textContent=`${diff>0?'+':''}${diff.toFixed(1)} kg`;el.className=diff<0?'positive':diff>0?'negative':''}
+  if(diff===null){el.textContent='—';el.className=''} else {el.textContent=`${diff>0?'+':''}${diff.toFixed(1)} kg`;el.className=diff<0?'positive':diff>0?'negative':''}
+  if(s.lastFace)setFaceUI(s.lastFace); else if(s.beforeFace)setFaceUI(s.beforeFace);
 }
 function clearScan(){
   if(!confirm('¿Borrar las fotos y mediciones de progreso?'))return;
-  state.scan={before:null,after:null,beforeWeight:null,afterWeight:null};save();renderScan();toast('Progreso visual borrado');
+  state.scan={before:null,after:null,beforeWeight:null,afterWeight:null,beforeFace:null,afterFace:null,lastFace:null};save();renderScan();toast('Progreso visual borrado');
 }
 
+function renderRecipes(){
+ const q=(document.getElementById('recipeSearch')?.value||'').toLowerCase();
+ const list=recipes.filter(r=>(currentRecipeFilter==='all'||r.cat===currentRecipeFilter)&&(r.title.toLowerCase().includes(q)||r.ingredients.join(' ').toLowerCase().includes(q)));
+ const el=document.getElementById('recipeList'); if(!el)return;
+ el.innerHTML=list.map(r=>`<article class="recipe-card"><img src="${r.img}" alt="${escapeHTML(r.title)}" loading="lazy"><div class="recipe-body"><button class="recipe-fav" onclick="toggleRecipeFav('${r.id}')"><i data-lucide="${(state.recipeFavs||[]).includes(r.id)?'heart':'heart'}" style="${(state.recipeFavs||[]).includes(r.id)?'fill:currentColor':''}"></i></button><span class="tag">${r.tag}</span><h3>${escapeHTML(r.title)}</h3><div class="recipe-meta"><span>${r.time} min</span><span>≈ ${r.kcal} kcal</span></div><details><summary style="font-size:12px;font-weight:800;cursor:pointer">Ver ingredientes y preparación</summary><ul class="recipe-ingredients">${r.ingredients.map(x=>`<li>${escapeHTML(x)}</li>`).join('')}</ul><p class="recipe-steps"><b>Preparación:</b> ${escapeHTML(r.steps)}</p></details></div></article>`).join('')||'<div class="empty" style="grid-column:1/-1"><p>No encontramos recetas.</p></div>';
+ lucide.createIcons();
+}
+function toggleRecipeFav(id){state.recipeFavs=Array.isArray(state.recipeFavs)?state.recipeFavs:[];state.recipeFavs=state.recipeFavs.includes(id)?state.recipeFavs.filter(x=>x!==id):[...state.recipeFavs,id];save();renderRecipes()}
+document.querySelectorAll('[data-rfilter]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-rfilter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentRecipeFilter=b.dataset.rfilter;renderRecipes()}));
+
+function initFaceMesh(){
+ if(faceMesh||typeof FaceMesh==='undefined')return;
+ faceMesh=new FaceMesh({locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
+ faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.55,minTrackingConfidence:.55});
+ faceMesh.onResults(res=>{faceBusy=false;const lm=res.multiFaceLandmarks?.[0];if(!lm){setFaceUI(null);return} const m=faceMetrics(lm);state.scan.lastFace=m;setFaceUI(m);});
+}
+function faceMetrics(l){
+ const xs=l.map(p=>p.x),ys=l.map(p=>p.y);const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const w=maxX-minX,h=maxY-minY;
+ const nose=l[1],leftEye=l[33],rightEye=l[263],leftEar=l[234],rightEar=l[454],upperLip=l[13],lowerLip=l[14];
+ const eyeY=(leftEye.y+rightEye.y)/2, eyeX=(leftEye.x+rightEye.x)/2; const tilt=Math.atan2(rightEye.y-leftEye.y,rightEye.x-leftEye.x)*180/Math.PI;
+ const yaw=(nose.x-eyeX)/Math.max((rightEye.x-leftEye.x),.001); const mouthGap=Math.abs(lowerLip.y-upperLip.y); const centered=Math.abs((minX+maxX)/2-.5);
+ const framing=w>.28&&w<.72&&h>.35&&h<.9&&centered<.18; const quality=framing&&Math.abs(tilt)<12?'Buena':framing?'Aceptable':'Repite la captura';
+ let orientation='Frente'; if(yaw>.16)orientation='Ligeramente a la izquierda'; if(yaw<-.16)orientation='Ligeramente a la derecha';
+ return {width:w,height:h,tilt,yaw,mouthGap,centered,framing,quality,orientation,eyeLine:eyeY,ts:new Date().toISOString()};
+}
+function setFaceUI(m){const dot=document.getElementById('faceDot'),status=document.getElementById('faceStatus');if(!dot||!status)return;if(!m){dot.classList.remove('ok');status.textContent='No se detectó un rostro';['faceDetected','faceFraming','faceOrientation','faceQuality'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=id==='faceDetected'?'No':'—'});return}dot.classList.add('ok');status.textContent='Rostro detectado correctamente';document.getElementById('faceDetected').textContent='Sí';document.getElementById('faceFraming').textContent=m.framing?'Correcto':'Ajustar';document.getElementById('faceOrientation').textContent=m.orientation;document.getElementById('faceQuality').textContent=m.quality;}
+async function analyzeLiveFace(){
+ initFaceMesh(); if(!faceMesh){toast('No se pudo cargar el escáner facial. Comprueba tu conexión.');return}
+ const video=document.getElementById('cameraVideo');if(!video.srcObject||video.readyState<2){toast('Primero abre la cámara');return} if(faceBusy)return;faceBusy=true;try{await faceMesh.send({image:video});toast(state.scan.lastFace?'✓ Rostro analizado':'No se detectó un rostro')}catch(e){faceBusy=false;toast('No se pudo analizar la cámara')}}
+function captureFaceAnalysis(type){return analyzeLiveFace().then(()=>{if(state.scan.lastFace){state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));save();}})}
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function addWater(ml){state.water+=ml;save();renderWater();renderStats();toast(`+${ml} ml de agua`)}
+function renderWater(){const v=state.water||0,g=state.waterGoal||2500,p=Math.min(100,Math.round(v/g*100)); const a=document.getElementById('waterValue'),b=document.getElementById('waterGoal'),bar=document.getElementById('waterBar'),txt=document.getElementById('waterText'); if(a)a.textContent=v;if(b)b.textContent=g;if(bar)bar.style.width=p+'%';if(txt)txt.textContent=`${v} de ${g} ml · ${p}%`; const hv=document.getElementById('homeWater'),hb=document.getElementById('homeWaterBar');if(hv)hv.textContent=v;if(hb)hb.style.width=p+'%'}
+function addFood(){const name=document.getElementById('foodName').value.trim(),k=Number(document.getElementById('foodKcal').value);if(!name||!k||k<=0){toast('Completa comida y calorías');return}state.foods.unshift({name,kcal:k,date:new Date().toLocaleTimeString('es-NI',{hour:'2-digit',minute:'2-digit'})});save();document.getElementById('foodName').value='';document.getElementById('foodKcal').value='';renderNutrition();toast('✓ Comida registrada')}
+function renderNutrition(){const foods=state.foods||[],cal=foods.reduce((a,x)=>a+Number(x.kcal||0),0),goal=state.foodGoal||2000; const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('foodCalories',cal);set('foodGoal',goal);set('foodRemaining',Math.max(0,goal-cal));const l=document.getElementById('foodList');if(l)l.innerHTML=foods.length?foods.map((x,i)=>`<div class="food-row"><span><b>${escapeHTML(x.name)}</b><br><small style="color:#999">${x.date}</small></span><strong>${x.kcal} kcal</strong></div>`).join(''):'<div class="empty"><p>Aún no hay comidas registradas.</p></div>'}
+function saveGoals(){const w=Number(document.getElementById('targetWeight').value),s=Number(document.getElementById('targetSessions').value);if(!w||w<=0||!s){toast('Introduce objetivos válidos');return}state.targetWeight=w;state.targetSessions=s;save();renderGoals();toast('✓ Objetivos guardados')}
+function renderGoals(){const w=state.weight||0,t=state.targetWeight||0,p=t&&w?Math.max(0,Math.min(100,Math.round((1-Math.abs(w-t)/Math.max(w,1))*100))):0;const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('goalWeightTitle',t?`${t} kg`:'—');set('goalWeightPercent',`${p}%`);const bar=document.getElementById('goalWeightBar');if(bar)bar.style.width=p+'%';const a=document.getElementById('targetWeight'),b=document.getElementById('targetSessions');if(a)a.value=t;if(b)b.value=state.targetSessions||5}
+function renderAdvancedHome(){const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('homeWeight',state.weight?`${state.weight}`:'—');set('homeGoal',state.goal||'—');set('homeMeasurements',(state.measurements||[]).length);renderWater()}
 function renderHome(){document.getElementById('homeWorkouts').innerHTML=workouts.slice(0,3).map(card).join('');}
 function renderWorkouts(){
  const q=(document.getElementById('workoutSearch')?.value||'').toLowerCase();
@@ -457,7 +562,7 @@ function renderStats(){
  document.getElementById('profileEmail').textContent=state.email;
  document.getElementById('nameInput').value=state.name;document.getElementById('emailInput').value=state.email;document.getElementById('weightInput').value=state.weight;document.getElementById('goalInput').value=state.goal;
  document.getElementById('sideAvatar').src='https://i.pravatar.cc/120?img=47';document.getElementById('profileAvatar').src='https://i.pravatar.cc/160?img=47';
- document.getElementById('homeChart').innerHTML=chartHTML();lucide.createIcons();
+ document.getElementById('homeChart').innerHTML=chartHTML();renderAdvancedHome();lucide.createIcons();
 }
 function renderProgress(){
  document.getElementById('totalCalories').textContent=money(state.calories);document.getElementById('totalSessions').textContent=state.sessions;document.getElementById('totalMinutes').textContent=state.minutes;
