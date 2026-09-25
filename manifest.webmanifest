@@ -1,0 +1,9 @@
+{
+  "name": "FITFORGE Fitness App",
+  "short_name": "FITFORGE",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f6f6f4",
+  "theme_color": "#ff5a00",
+  "icons": []
+}
