@@ -1066,10 +1066,15 @@ async function captureScan(type){
   const video=document.getElementById('cameraVideo');
   if(!video.srcObject || video.readyState<2){toast('Primero abre la cámara');return}
   const ok=await analyzeLiveFace();
-  if(!ok||!state.scan.lastFace){toast('Coloca tu rostro dentro del sensor y vuelve a intentarlo');return}
-  const canvas=document.getElementById('scanCanvas');canvas.width=video.videoWidth||640;canvas.height=video.videoHeight||480;canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
-  state.scan[type]=canvas.toDataURL('image/jpeg',.86);state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));state.scan[type+'Shape']=JSON.parse(JSON.stringify(state.scan.lastFace.shape));
-  save();renderScan();toast(type==='before'?'✓ Escaneo inicial guardado':'✓ Escaneo actual guardado');
+  if(!ok || !state.scan.lastFace){toast('No se pudo completar el escaneo. Centra el rostro y mantente quieto unos segundos.');return}
+  const canvas=document.getElementById('scanCanvas');
+  canvas.width=video.videoWidth||640;canvas.height=video.videoHeight||480;
+  canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+  state.scan[type]=canvas.toDataURL('image/jpeg',.86);
+  state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));
+  state.scan[type+'Shape']=JSON.parse(JSON.stringify(state.scan.lastFace.shape));
+  save();renderScan();
+  toast(type==='before'?'✓ Escaneo inicial completado':'✓ Escaneo actual completado');
 }
 function saveScanWeight(){
   const value=Number(document.getElementById('scanWeight').value);
@@ -1150,18 +1155,25 @@ async function analyzeLiveFace(silent=false){
  if(faceBusy)return !!state.scan.lastFace;
  faceBusy=true;
  try{
-   const ok=await new Promise(async resolve=>{
-     let done=false;const finish=v=>{if(done)return;done=true;resolve(v)};
-     const timeout=setTimeout(()=>finish(false),1150);
-     const previous=faceMesh.__fitforgeOnce;
-     faceMesh.__fitforgeOnce=(has)=>{clearTimeout(timeout);faceMesh.__fitforgeOnce=null;finish(has)};
-     try{await faceMesh.send({image:video})}catch(e){clearTimeout(timeout);faceMesh.__fitforgeOnce=null;finish(false)}
-   });
-   if(!silent)toast(ok?'✓ Rostro escaneado':'Acerca o centra el rostro dentro del sensor');
-   return ok;
+   // Damos varias oportunidades al modelo: en móviles la primera imagen puede tardar.
+   for(let attempt=0;attempt<5;attempt++){
+     const ok=await new Promise(async resolve=>{
+       let done=false;const finish=v=>{if(done)return;done=true;resolve(v)};
+       const timeout=setTimeout(()=>finish(false),900);
+       faceMesh.__fitforgeOnce=has=>{clearTimeout(timeout);faceMesh.__fitforgeOnce=null;finish(has)};
+       try{await faceMesh.send({image:video})}catch(e){clearTimeout(timeout);faceMesh.__fitforgeOnce=null;finish(false)}
+     });
+     if(ok&&state.scan.lastFace){
+       if(!silent)toast('✓ Escaneo facial completado');
+       return true;
+     }
+     await new Promise(r=>setTimeout(r,120));
+   }
+   if(!silent)toast('No detecté el rostro. Centra la cara y prueba de nuevo.');
+   return false;
  }finally{faceBusy=false}
 }
-function captureFaceAnalysis(type){return analyzeLiveFace().then(ok=>{if(ok&&state.scan.lastFace){state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));save();}})}
+function captureFaceAnalysis(type){return analyzeLiveFace().then(ok=>{if(ok&&state.scan.lastFace){state.scan[type+'Face']=JSON.parse(JSON.stringify(state.scan.lastFace));save();renderScan();toast(type==='before'?'✓ Escaneo inicial guardado':'✓ Escaneo actual guardado');}})}
 function todayKey(){return new Date().toISOString().slice(0,10)}
 function addWater(ml){state.water+=ml;rewardActivity('water',10);save();renderWater();renderStats();toast(`+${ml} ml de agua`)}
 function renderWater(){const v=state.water||0,g=state.waterGoal||2500,p=Math.min(100,Math.round(v/g*100)); const a=document.getElementById('waterValue'),b=document.getElementById('waterGoal'),bar=document.getElementById('waterBar'),txt=document.getElementById('waterText'); if(a)a.textContent=v;if(b)b.textContent=g;if(bar)bar.style.width=p+'%';if(txt)txt.textContent=`${v} de ${g} ml · ${p}%`; const hv=document.getElementById('homeWater'),hb=document.getElementById('homeWaterBar');if(hv)hv.textContent=v;if(hb)hb.style.width=p+'%'}
